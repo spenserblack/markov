@@ -21,8 +21,11 @@ func NewSentence(words string, prefixLen int) Markov {
 
 	splitWords := strings.Split(words, " ")
 
+	var lastPrefix string
+
 	for i, suffix := range splitWords[prefixLen:] {
 		prefix := strings.Join(splitWords[i:i+prefixLen], " ")
+		lastPrefix = suffix
 
 		if i == 0 {
 			chainStarters = append(chainStarters, prefix)
@@ -31,10 +34,12 @@ func NewSentence(words string, prefixLen int) Markov {
 		if suffixes, ok := chain[prefix]; ok {
 			chain[prefix] = append(suffixes, suffix)
 		} else {
-			chain[prefix] = make([]string, 1)
-			chain[prefix][0] = suffix
+			chain[prefix] = []string{suffix}
 		}
 	}
+
+	chain[lastPrefix] = []string{""}
+	chain[""] = make([]string, 0, 0)
 
 	markov := Markov{chain, chainStarters}
 
