@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -14,7 +15,20 @@ type Markov struct {
 }
 
 func main() {
-	markov := NewSentence("hello goodbye hello go hello world", 1)
+	prefixLen := flag.Int("n", 1, "length of words to use as a key")
+	printHelp := flag.Bool("h", false, "print this help message")
+	flag.Parse()
+
+	feed := flag.Arg(0)
+
+	if *printHelp || feed == "" {
+		println("usage: markov [OPTIONS] [TEXT]")
+		println("TEXT: the text to feed to the markov chain")
+		flag.PrintDefaults()
+		return
+	}
+
+	markov := NewSentence(feed, *prefixLen)
 	fmt.Println(markov.generate())
 }
 
