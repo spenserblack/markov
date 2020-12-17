@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 type Markov struct {
@@ -15,6 +16,10 @@ type Markov struct {
 func main() {
 	markov := NewSentence("hello goodbye hello go hello world", 1)
 	fmt.Println(markov.generate())
+}
+
+func init() {
+	rand.Seed(time.Now().Unix())
 }
 
 func (markov Markov) generate() string {
