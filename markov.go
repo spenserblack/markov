@@ -77,7 +77,7 @@ func NewSentence(words string, prefixLen int) Markov {
 		}
 	}
 
-	chain[lastPrefix] = []string{""}
+	chain[lastPrefix] = append(chain[lastPrefix], "")
 	chain[""] = make([]string, 0, 0)
 
 	markov := Markov{chain, chainStarters, prefixLen}
