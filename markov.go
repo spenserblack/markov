@@ -42,7 +42,7 @@ func (markov Markov) generate() string {
 
 func NewSentence(words string, prefixLen int) Markov {
 	chain := make(map[string][]string)
-	chainStarters := make([]string, 1)
+	chainStarters := make([]string, 0)
 
 	splitWords := strings.Split(words, " ")
 
