@@ -2,17 +2,37 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 )
 
 type Markov struct {
 	Chain         map[string][]string
 	chainStarters []string
+	prefixLen     int
 }
 
 func main() {
 	markov := NewSentence("hello goodbye hello go hello world", 1)
-	fmt.Println(markov)
+	fmt.Println(markov.generate())
+}
+
+func (markov Markov) generate() string {
+	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
+	output := starter
+
+	for {
+		splitWords := strings.Split(output, " ")
+		lastWords := splitWords[len(splitWords)-markov.prefixLen:]
+		key := strings.Join(lastWords, " ")
+		nextValues := markov.Chain[key]
+
+		if len(nextValues) == 0 {
+			return output
+		}
+
+		output = fmt.Sprintf("%v %v", output, nextValues[rand.Intn(len(nextValues))])
+	}
 }
 
 func NewSentence(words string, prefixLen int) Markov {
@@ -41,7 +61,7 @@ func NewSentence(words string, prefixLen int) Markov {
 	chain[lastPrefix] = []string{""}
 	chain[""] = make([]string, 0, 0)
 
-	markov := Markov{chain, chainStarters}
+	markov := Markov{chain, chainStarters, prefixLen}
 
 	return markov
 }
