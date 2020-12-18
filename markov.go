@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-// Markov chain container.
-type Markov struct {
+// Markov chain container for creating a sentence.
+type SentenceMarkov struct {
 	chain         map[string][]string
 	chainStarters []string
 	prefixLen     int
@@ -39,7 +39,7 @@ func init() {
 }
 
 // Generate a random sentence from the Markov chain.
-func (markov Markov) Generate() string {
+func (markov SentenceMarkov) Generate() string {
 	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
 	output := starter
 
@@ -65,7 +65,7 @@ func (markov Markov) Generate() string {
 // word. For example, if `prefixLen` is 2 and the generated text is "I made a
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
-func NewSentence(sentences []string, prefixLen int) Markov {
+func NewSentence(sentences []string, prefixLen int) SentenceMarkov {
 	chain := make(map[string][]string)
 	chainStarters := make([]string, 0)
 
@@ -89,7 +89,7 @@ func NewSentence(sentences []string, prefixLen int) Markov {
 
 	chain[""] = make([]string, 0, 0)
 
-	markov := Markov{chain, chainStarters, prefixLen}
+	markov := SentenceMarkov{chain, chainStarters, prefixLen}
 
 	return markov
 }
