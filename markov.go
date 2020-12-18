@@ -103,7 +103,5 @@ func NewSentence(sentences []string, prefixLen int) SentenceMarkov {
 
 	waiter.Wait()
 
-	markov.chain[""] = make([]string, 0, 0)
-
 	return markov
 }
