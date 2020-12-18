@@ -9,7 +9,7 @@ import (
 )
 
 type Markov struct {
-	Chain         map[string][]string
+	chain         map[string][]string
 	chainStarters []string
 	prefixLen     int
 }
@@ -44,7 +44,7 @@ func (markov Markov) generate() string {
 		splitWords := strings.Split(output, " ")
 		lastWords := splitWords[len(splitWords)-markov.prefixLen:]
 		key := strings.Join(lastWords, " ")
-		nextValues := markov.Chain[key]
+		nextValues := markov.chain[key]
 
 		if len(nextValues) == 0 {
 			return output
