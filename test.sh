@@ -1,3 +1,6 @@
 #!/bin/bash
 LEN=${1:-"1"}
-go run markov.go -n $LEN "Hello World Hello Go Goodbye World Goodbye Go Goodbye Markov Hello Markov Go Markov Go Go Go"
+go run markov.go -n $LEN "This is a sentence.
+This is a test.
+That is a string.
+That is random."
