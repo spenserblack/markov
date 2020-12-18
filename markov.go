@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"sync"
 	"time"
 )
 
 // Markov chain container for creating a sentence.
 type SentenceMarkov struct {
+	sync.Mutex
 	chain         map[string][]string
 	chainStarters []string
 	prefixLen     int
@@ -66,30 +68,42 @@ func (markov SentenceMarkov) Generate() string {
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
 func NewSentence(sentences []string, prefixLen int) SentenceMarkov {
-	chain := make(map[string][]string)
-	chainStarters := make([]string, 0)
+	markov := SentenceMarkov{}
+	markov.chain = make(map[string][]string)
+	markov.prefixLen = prefixLen
+	var waiter sync.WaitGroup
 
 	for _, words := range sentences {
-		splitWords := strings.Split(words, " ")
+		// Let waiter know that goroutine will start
+		waiter.Add(1)
 
-		for i, suffix := range splitWords[prefixLen:] {
-			prefix := strings.Join(splitWords[i:i+prefixLen], " ")
+		go func(sentence string) {
+			// Let waiter know that goroutine has finished
+			defer waiter.Done()
 
-			if i == 0 {
-				chainStarters = append(chainStarters, prefix)
+			splitWords := strings.Split(sentence, " ")
+
+			for i, suffix := range splitWords[prefixLen:] {
+				prefix := strings.Join(splitWords[i:i+prefixLen], " ")
+
+				markov.Lock()
+				if i == 0 {
+					markov.chainStarters = append(markov.chainStarters, prefix)
+				}
+
+				if suffixes, ok := markov.chain[prefix]; ok {
+					markov.chain[prefix] = append(suffixes, suffix)
+				} else {
+					markov.chain[prefix] = []string{suffix}
+				}
+				markov.Unlock()
 			}
-
-			if suffixes, ok := chain[prefix]; ok {
-				chain[prefix] = append(suffixes, suffix)
-			} else {
-				chain[prefix] = []string{suffix}
-			}
-		}
+		}(words)
 	}
 
-	chain[""] = make([]string, 0, 0)
+	waiter.Wait()
 
-	markov := SentenceMarkov{chain, chainStarters, prefixLen}
+	markov.chain[""] = make([]string, 0, 0)
 
 	return markov
 }
