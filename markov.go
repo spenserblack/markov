@@ -1,3 +1,4 @@
+// Use a Markov chain to generate randomized sentences.
 package main
 
 import (
@@ -8,6 +9,7 @@ import (
 	"time"
 )
 
+// Markov chain container.
 type Markov struct {
 	chain         map[string][]string
 	chainStarters []string
@@ -36,6 +38,7 @@ func init() {
 	rand.Seed(time.Now().Unix())
 }
 
+// Generate a random sentence from the Markov chain.
 func (markov Markov) Generate() string {
 	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
 	output := starter
@@ -54,6 +57,14 @@ func (markov Markov) Generate() string {
 	}
 }
 
+// Feed data to create a Markov chain.
+// `words` should be a string of space-separated words to be used when building
+// the chain -- order of the words determines how each next word in a generated
+// sentence is decided.
+// `prefixLen` is the number of words to be used as a "key" to deciding the next
+// word. For example, if `prefixLen` is 2 and the generated text is "I made a
+// chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
+// the sentence.
 func NewSentence(words string, prefixLen int) Markov {
 	chain := make(map[string][]string)
 	chainStarters := make([]string, 0)
