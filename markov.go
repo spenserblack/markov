@@ -18,7 +18,15 @@ type SentenceMarkov struct {
 	prefixLen     int
 }
 
+// To be implemented by types, specifically Markov chains, that generate a
+// random string output.
+type Generator interface {
+	// Generate a random output using a Markov chain.
+	Generate() string
+}
+
 func main() {
+	var markov Generator
 	prefixLen := flag.Int("n", 1, "length of words to use as a key")
 	printHelp := flag.Bool("h", false, "print this help message")
 	flag.Parse()
@@ -32,7 +40,7 @@ func main() {
 		return
 	}
 
-	markov := NewSentence(strings.Split(feed, "\n"), *prefixLen)
+	markov = NewSentence(strings.Split(feed, "\n"), *prefixLen)
 	fmt.Println(markov.Generate())
 }
 
