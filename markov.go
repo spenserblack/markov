@@ -29,14 +29,14 @@ func main() {
 	}
 
 	markov := NewSentence(feed, *prefixLen)
-	fmt.Println(markov.generate())
+	fmt.Println(markov.Generate())
 }
 
 func init() {
 	rand.Seed(time.Now().Unix())
 }
 
-func (markov Markov) generate() string {
+func (markov Markov) Generate() string {
 	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
 	output := starter
 
