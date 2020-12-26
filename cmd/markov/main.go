@@ -49,7 +49,7 @@ func init() {
 }
 
 // Generate a random sentence from the Markov chain.
-func (markov SentenceMarkov) Generate() string {
+func (markov *SentenceMarkov) Generate() string {
 	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
 	output := starter
 
