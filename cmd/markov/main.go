@@ -75,7 +75,7 @@ func (markov SentenceMarkov) Generate() string {
 // word. For example, if `prefixLen` is 2 and the generated text is "I made a
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
-func NewSentence(sentences []string, prefixLen int) SentenceMarkov {
+func NewSentence(sentences []string, prefixLen int) *SentenceMarkov {
 	markov := SentenceMarkov{}
 	markov.chain = make(map[string][]string)
 	markov.prefixLen = prefixLen
@@ -111,5 +111,5 @@ func NewSentence(sentences []string, prefixLen int) SentenceMarkov {
 
 	waiter.Wait()
 
-	return markov
+	return &markov
 }
