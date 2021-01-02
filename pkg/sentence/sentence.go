@@ -10,14 +10,14 @@ import (
 // Markov chain container for creating a sentence.
 type Markov struct {
 	sync.Mutex
-	chain         map[string][]string
-	chainStarters []string
-	prefixLen     int
+	chain     map[string][]string
+	prefixLen int
 }
 
 // Generate a random sentence from the Markov chain.
 func (markov *Markov) Generate() string {
-	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
+	chainStarters := markov.chain[""]
+	starter := chainStarters[rand.Intn(len(chainStarters))]
 	output := starter
 
 	for {
@@ -63,7 +63,7 @@ func New(sentences []string, prefixLen int) *Markov {
 
 				markov.Lock()
 				if i == 0 {
-					markov.chainStarters = append(markov.chainStarters, prefix)
+					markov.chain[""] = append(markov.chain[""], prefix)
 				}
 
 				if suffixes, ok := markov.chain[prefix]; ok {
