@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/spenserblack/markov/pkg/generator"
 	"github.com/spenserblack/markov/pkg/sentence"
+	"github.com/spenserblack/markov/pkg/word"
 	"math/rand"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ import (
 func main() {
 	var markov generator.Generator
 	prefixLen := flag.Int("n", 1, "length of words to use as a key")
+	genWord := flag.Bool("w", false, "generate a word instead of a sentence")
 	printHelp := flag.Bool("h", false, "print this help message")
 	flag.Parse()
 
@@ -26,7 +28,12 @@ func main() {
 		return
 	}
 
-	markov = sentence.New(strings.Split(feed, "\n"), *prefixLen)
+	if *genWord {
+		markov = word.New(strings.Split(feed, " "), *prefixLen)
+	} else {
+		markov = sentence.New(strings.Split(feed, "\n"), *prefixLen)
+	}
+
 	fmt.Println(markov.Generate())
 }
 
