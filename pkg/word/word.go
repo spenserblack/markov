@@ -18,18 +18,26 @@ type Markov struct {
 func (markov *Markov) Generate() string {
 	var builder strings.Builder
 	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
+	lastRunes := []rune(starter)
+	lastRunesLen := len(lastRunes)
 	builder.WriteString(starter)
 
 	for {
-		output := builder.String()
-		key := string(output[len(output)-markov.prefixLen:])
+		key := string(lastRunes)
 		nextValues := markov.chain[key]
 
 		if len(nextValues) == 0 {
 			return builder.String()
 		}
 
-		builder.WriteRune(nextValues[rand.Intn(len(nextValues))])
+		nextValue := nextValues[rand.Intn(len(nextValues))]
+
+		for i := 0; i < lastRunesLen-1; i++ {
+			lastRunes[i] = lastRunes[i+1]
+		}
+		lastRunes[lastRunesLen-1] = nextValue
+
+		builder.WriteRune(nextValue)
 	}
 }
 

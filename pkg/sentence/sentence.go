@@ -18,11 +18,11 @@ func (markov *Markov) Generate() string {
 	var builder strings.Builder
 	chainStarters := markov.chain[""]
 	starter := chainStarters[rand.Intn(len(chainStarters))]
+	lastWords := strings.Split(starter, " ")
+	lastWordsLen := len(lastWords)
 	builder.WriteString(starter)
 
 	for {
-		splitWords := strings.Split(builder.String(), " ")
-		lastWords := splitWords[len(splitWords)-markov.prefixLen:]
 		key := strings.Join(lastWords, " ")
 		nextValues := markov.chain[key]
 
@@ -30,8 +30,15 @@ func (markov *Markov) Generate() string {
 			return builder.String()
 		}
 
+		nextValue := nextValues[rand.Intn(len(nextValues))]
+
+		for i := 0; i < lastWordsLen-1; i++ {
+			lastWords[i] = lastWords[i+1]
+		}
+		lastWords[lastWordsLen-1] = nextValue
+
 		builder.WriteRune(' ')
-		builder.WriteString(nextValues[rand.Intn(len(nextValues))])
+		builder.WriteString(nextValue)
 	}
 }
 
