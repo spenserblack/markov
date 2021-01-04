@@ -7,6 +7,7 @@ import (
 	"github.com/spenserblack/markov/pkg/generator"
 	"github.com/spenserblack/markov/pkg/generator/sentence"
 	"github.com/spenserblack/markov/pkg/generator/word"
+	"io/ioutil"
 	"math/rand"
 	"strings"
 	"time"
@@ -19,17 +20,25 @@ func main() {
 	printHelp := flag.Bool("h", false, "print this help message")
 	flag.Parse()
 
-	feed := flag.Arg(0)
+	feedFile := flag.Arg(0)
 
-	if *printHelp || feed == "" {
+	if *printHelp || feedFile == "" {
 		println("usage: markov [OPTIONS] [TEXT]")
 		println("TEXT: the text to feed to the markov chain")
 		flag.PrintDefaults()
 		return
 	}
 
+	feedBytes, err := ioutil.ReadFile(feedFile)
+
+	if err != nil {
+		panic(err)
+	}
+
+	feed := string(feedBytes)
+
 	if *genWord {
-		markov = word.New(strings.Split(feed, " "), *prefixLen)
+		markov = word.New(strings.Split(feed, "\n"), *prefixLen)
 	} else {
 		markov = sentence.New(strings.Split(feed, "\n"), *prefixLen)
 	}

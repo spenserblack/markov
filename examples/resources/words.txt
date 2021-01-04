@@ -1,0 +1,9 @@
+Go
+Golang
+Goodbye
+GoodMorning
+GoodDay
+Markov
+Makes
+Its
+Mark
