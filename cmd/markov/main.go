@@ -14,7 +14,7 @@ import (
 
 func main() {
 	var markov generator.Generator
-	prefixLen := flag.Int("n", 1, "length of words to use as a key")
+	prefixLen := flag.Int("n", 1, "number of tokens to use to map following token")
 	genWord := flag.Bool("w", false, "generate a word instead of a sentence")
 	printHelp := flag.Bool("h", false, "print this help message")
 	flag.Parse()
