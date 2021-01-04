@@ -2,6 +2,7 @@ package word
 
 import (
 	"math/rand"
+	"strings"
 	"sync"
 )
 
@@ -15,19 +16,20 @@ type Markov struct {
 
 // Generate a random word from the Markov chain.
 func (markov *Markov) Generate() string {
-	var output []rune
+	var builder strings.Builder
 	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
-	output = []rune(starter)
+	builder.WriteString(starter)
 
 	for {
+		output := builder.String()
 		key := string(output[len(output)-markov.prefixLen:])
 		nextValues := markov.chain[key]
 
 		if len(nextValues) == 0 {
-			return string(output)
+			return builder.String()
 		}
 
-		output = append(output, nextValues[rand.Intn(len(nextValues))])
+		builder.WriteRune(nextValues[rand.Intn(len(nextValues))])
 	}
 }
 

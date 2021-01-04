@@ -1,7 +1,6 @@
 package sentence
 
 import (
-	"fmt"
 	"math/rand"
 	"strings"
 	"sync"
@@ -16,21 +15,23 @@ type Markov struct {
 
 // Generate a random sentence from the Markov chain.
 func (markov *Markov) Generate() string {
+	var builder strings.Builder
 	chainStarters := markov.chain[""]
 	starter := chainStarters[rand.Intn(len(chainStarters))]
-	output := starter
+	builder.WriteString(starter)
 
 	for {
-		splitWords := strings.Split(output, " ")
+		splitWords := strings.Split(builder.String(), " ")
 		lastWords := splitWords[len(splitWords)-markov.prefixLen:]
 		key := strings.Join(lastWords, " ")
 		nextValues := markov.chain[key]
 
 		if len(nextValues) == 0 {
-			return output
+			return builder.String()
 		}
 
-		output = fmt.Sprintf("%v %v", output, nextValues[rand.Intn(len(nextValues))])
+		builder.WriteRune(' ')
+		builder.WriteString(nextValues[rand.Intn(len(nextValues))])
 	}
 }
 
