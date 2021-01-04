@@ -35,6 +35,10 @@ func main() {
 		panic(err)
 	}
 
+	if feedBytes[len(feedBytes)-1] == '\n' {
+		feedBytes = feedBytes[:len(feedBytes)-1]
+	}
+
 	feed := string(feedBytes)
 
 	if *genWord {
