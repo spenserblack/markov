@@ -1,3 +1,5 @@
+![CI](https://github.com/spenserblack/markov/workflows/CI/badge.svg)
+
 My attempt at setting up a Markov chain without fully understanding how it works.
 
 ## Install
