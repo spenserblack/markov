@@ -1,5 +1,11 @@
 My attempt at setting up a Markov chain without fully understanding how it works.
 
+## Install
+
+```bash
+go get -u github.com/spenserblack/markov/cmd/...
+```
+
 ## Build Binary
 
 ```bash
@@ -13,16 +19,16 @@ that should be fed to the chain separated by newlines (see the [example input fi
 
 ```bash
 # print help
-./markov -h
+markov -h
 
 # feed a list of sentences and generate a random sentence
-./markov <filename>
+markov <filename>
 
 # feed a list of words and generate a random word
-./markov -w <filename>
+markov -w <filename>
 
 # specify the number of previous tokens to use when mapping the next token
-./markov -n <token number> <remaining args>
+markov -n <token number> <remaining args>
 ```
 
 [example input files]: ./examples/resources
