@@ -66,8 +66,15 @@ func New(sentences []string, prefixLen int) *Markov {
 
 			splitWords := strings.Split(sentence, " ")
 
-			for i, suffix := range splitWords[prefixLen:] {
-				prefix := strings.Join(splitWords[i:i+prefixLen], " ")
+			var adjustedPrefixLen int
+			if splitWordsLen := len(splitWords); prefixLen >= splitWordsLen {
+				adjustedPrefixLen = splitWordsLen - 1
+			} else {
+				adjustedPrefixLen = prefixLen
+			}
+
+			for i, suffix := range splitWords[adjustedPrefixLen:] {
+				prefix := strings.Join(splitWords[i:i+adjustedPrefixLen], " ")
 
 				markov.Lock()
 				if i == 0 {

@@ -62,8 +62,15 @@ func New(words []string, prefixLen int) *Markov {
 			// Let waiter know that goroutine has finished
 			defer waiter.Done()
 
-			for i, suffix := range word[prefixLen:] {
-				prefix := word[i : i+prefixLen]
+			var adjustedPrefixLen int
+			if wordLen := len(word); prefixLen >= wordLen {
+				adjustedPrefixLen = wordLen - 1
+			} else {
+				adjustedPrefixLen = prefixLen
+			}
+
+			for i, suffix := range word[adjustedPrefixLen:] {
+				prefix := word[i : i+adjustedPrefixLen]
 
 				markov.Lock()
 				if i == 0 {
