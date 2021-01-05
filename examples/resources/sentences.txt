@@ -1,4 +1,0 @@
-This is a sentence.
-This is a test.
-That is a string.
-That is random.
