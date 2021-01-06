@@ -48,8 +48,8 @@ func (generator *Markov) Generate() string {
 // `prefixLen` is the number of letters to be used as a "key" to deciding the next
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
-func New(words []string, prefixLen int) *Markov {
-	generator := new(Markov)
+func New(words []string, prefixLen int) (generator *Markov) {
+	generator = new(Markov)
 	generator.chain = make(map[string][]rune)
 	generator.prefixLen = prefixLen
 	var waiter sync.WaitGroup
@@ -88,6 +88,5 @@ func New(words []string, prefixLen int) *Markov {
 	}
 
 	waiter.Wait()
-
-	return generator
+	return
 }
