@@ -15,16 +15,16 @@ type Markov struct {
 }
 
 // Generate a random word from the Markov chain.
-func (markov *Markov) Generate() string {
+func (generator *Markov) Generate() string {
 	var builder strings.Builder
-	starter := markov.chainStarters[rand.Intn(len(markov.chainStarters))]
+	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
 	lastRunes := []rune(starter)
 	lastRunesLen := len(lastRunes)
 	builder.WriteString(starter)
 
 	for {
 		key := string(lastRunes)
-		nextValues := markov.chain[key]
+		nextValues := generator.chain[key]
 
 		if len(nextValues) == 0 {
 			return builder.String()
@@ -49,9 +49,9 @@ func (markov *Markov) Generate() string {
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
 func New(words []string, prefixLen int) *Markov {
-	markov := new(Markov)
-	markov.chain = make(map[string][]rune)
-	markov.prefixLen = prefixLen
+	generator := new(Markov)
+	generator.chain = make(map[string][]rune)
+	generator.prefixLen = prefixLen
 	var waiter sync.WaitGroup
 
 	for _, word := range words {
@@ -72,22 +72,22 @@ func New(words []string, prefixLen int) *Markov {
 			for i, suffix := range word[adjustedPrefixLen:] {
 				prefix := word[i : i+adjustedPrefixLen]
 
-				markov.mutex.Lock()
+				generator.mutex.Lock()
 				if i == 0 {
-					markov.chainStarters = append(markov.chainStarters, prefix)
+					generator.chainStarters = append(generator.chainStarters, prefix)
 				}
 
-				if suffixes, ok := markov.chain[prefix]; ok {
-					markov.chain[prefix] = append(suffixes, suffix)
+				if suffixes, ok := generator.chain[prefix]; ok {
+					generator.chain[prefix] = append(suffixes, suffix)
 				} else {
-					markov.chain[prefix] = []rune{suffix}
+					generator.chain[prefix] = []rune{suffix}
 				}
-				markov.mutex.Unlock()
+				generator.mutex.Unlock()
 			}
 		}(word)
 	}
 
 	waiter.Wait()
 
-	return markov
+	return generator
 }

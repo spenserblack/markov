@@ -14,9 +14,9 @@ type Markov struct {
 }
 
 // Generate a random sentence from the Markov chain.
-func (markov *Markov) Generate() string {
+func (generator *Markov) Generate() string {
 	var builder strings.Builder
-	chainStarters := markov.chain[""]
+	chainStarters := generator.chain[""]
 	starter := chainStarters[rand.Intn(len(chainStarters))]
 	lastWords := strings.Split(starter, " ")
 	lastWordsLen := len(lastWords)
@@ -24,7 +24,7 @@ func (markov *Markov) Generate() string {
 
 	for {
 		key := strings.Join(lastWords, " ")
-		nextValues := markov.chain[key]
+		nextValues := generator.chain[key]
 
 		if len(nextValues) == 0 {
 			return builder.String()
@@ -51,9 +51,9 @@ func (markov *Markov) Generate() string {
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
 func New(sentences []string, prefixLen int) *Markov {
-	markov := new(Markov)
-	markov.chain = make(map[string][]string)
-	markov.prefixLen = prefixLen
+	generator := new(Markov)
+	generator.chain = make(map[string][]string)
+	generator.prefixLen = prefixLen
 	var waiter sync.WaitGroup
 
 	for _, words := range sentences {
@@ -76,22 +76,22 @@ func New(sentences []string, prefixLen int) *Markov {
 			for i, suffix := range splitWords[adjustedPrefixLen:] {
 				prefix := strings.Join(splitWords[i:i+adjustedPrefixLen], " ")
 
-				markov.mutex.Lock()
+				generator.mutex.Lock()
 				if i == 0 {
-					markov.chain[""] = append(markov.chain[""], prefix)
+					generator.chain[""] = append(generator.chain[""], prefix)
 				}
 
-				if suffixes, ok := markov.chain[prefix]; ok {
-					markov.chain[prefix] = append(suffixes, suffix)
+				if suffixes, ok := generator.chain[prefix]; ok {
+					generator.chain[prefix] = append(suffixes, suffix)
 				} else {
-					markov.chain[prefix] = []string{suffix}
+					generator.chain[prefix] = []string{suffix}
 				}
-				markov.mutex.Unlock()
+				generator.mutex.Unlock()
 			}
 		}(words)
 	}
 
 	waiter.Wait()
 
-	return markov
+	return generator
 }
