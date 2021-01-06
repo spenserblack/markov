@@ -8,7 +8,7 @@ import (
 
 // Markov chain container for creating a sentence.
 type Markov struct {
-	sync.Mutex
+	mutex     sync.Mutex
 	chain     map[string][]string
 	prefixLen int
 }
@@ -76,7 +76,7 @@ func New(sentences []string, prefixLen int) *Markov {
 			for i, suffix := range splitWords[adjustedPrefixLen:] {
 				prefix := strings.Join(splitWords[i:i+adjustedPrefixLen], " ")
 
-				markov.Lock()
+				markov.mutex.Lock()
 				if i == 0 {
 					markov.chain[""] = append(markov.chain[""], prefix)
 				}
@@ -86,7 +86,7 @@ func New(sentences []string, prefixLen int) *Markov {
 				} else {
 					markov.chain[prefix] = []string{suffix}
 				}
-				markov.Unlock()
+				markov.mutex.Unlock()
 			}
 		}(words)
 	}

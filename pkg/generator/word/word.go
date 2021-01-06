@@ -8,7 +8,7 @@ import (
 
 // Markov chain container for creating a word.
 type Markov struct {
-	sync.Mutex
+	mutex         sync.Mutex
 	chain         map[string][]rune
 	chainStarters []string
 	prefixLen     int
@@ -72,7 +72,7 @@ func New(words []string, prefixLen int) *Markov {
 			for i, suffix := range word[adjustedPrefixLen:] {
 				prefix := word[i : i+adjustedPrefixLen]
 
-				markov.Lock()
+				markov.mutex.Lock()
 				if i == 0 {
 					markov.chainStarters = append(markov.chainStarters, prefix)
 				}
@@ -82,7 +82,7 @@ func New(words []string, prefixLen int) *Markov {
 				} else {
 					markov.chain[prefix] = []rune{suffix}
 				}
-				markov.Unlock()
+				markov.mutex.Unlock()
 			}
 		}(word)
 	}
