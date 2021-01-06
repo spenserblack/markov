@@ -49,7 +49,7 @@ func (markov *Markov) Generate() string {
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
 func New(words []string, prefixLen int) *Markov {
-	markov := Markov{}
+	markov := new(Markov)
 	markov.chain = make(map[string][]rune)
 	markov.prefixLen = prefixLen
 	var waiter sync.WaitGroup
@@ -89,5 +89,5 @@ func New(words []string, prefixLen int) *Markov {
 
 	waiter.Wait()
 
-	return &markov
+	return markov
 }

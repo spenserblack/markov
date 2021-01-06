@@ -51,7 +51,7 @@ func (markov *Markov) Generate() string {
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
 func New(sentences []string, prefixLen int) *Markov {
-	markov := Markov{}
+	markov := new(Markov)
 	markov.chain = make(map[string][]string)
 	markov.prefixLen = prefixLen
 	var waiter sync.WaitGroup
@@ -93,5 +93,5 @@ func New(sentences []string, prefixLen int) *Markov {
 
 	waiter.Wait()
 
-	return &markov
+	return markov
 }
