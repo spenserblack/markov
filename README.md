@@ -17,7 +17,7 @@ make markov
 ## Binary Usage
 
 The binary takes a filename which should point to a file containing tokens
-that should be fed to the chain separated by newlines (see the [example input files]). 
+that should be fed to the chain separated by newlines (see the [example input files]).
 
 ```bash
 # print help
@@ -67,13 +67,13 @@ What this does is tell the generator to look 1 token back (so 1 word back) to de
   - 2/4 chance of being followed by "bar"
   - 1/4 chance of being followed by "foo"
   - 1/4 chance of being followed by "baz"
-- "bar" has a 
+- "bar" has a
   - 1/3 chance of being followed by "bar"
   - 1/3 chance of ending a sentence
   - 1/3 chance of ending a sentence
 - "baz" has a
   - 2/2 chance of ending a sentence
-  
+
 ### Generate random word
 
 In a word, each letter (or `rune`) is a token.
