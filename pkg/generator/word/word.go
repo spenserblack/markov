@@ -24,9 +24,9 @@ func (generator *Markov) Generate() string {
 
 	for {
 		key := string(lastRunes)
-		nextValues := generator.chain[key]
+		nextValues, nextValuesExist := generator.chain[key]
 
-		if len(nextValues) == 0 {
+		if !nextValuesExist {
 			return builder.String()
 		}
 
