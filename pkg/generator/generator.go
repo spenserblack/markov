@@ -4,4 +4,7 @@ package generator
 type Generator interface {
 	// Generate returns a random output using a Markov chain.
 	Generate() string
+	// LimitedGenerate returns a random output using a markov chain,
+	// with a set maximum number of tokens.
+	LimitedGenerate(maxTokens int) (output string, err error)
 }

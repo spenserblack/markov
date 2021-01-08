@@ -1,6 +1,7 @@
 package word
 
 import (
+	"errors"
 	"math/rand"
 	"strings"
 	"sync"
@@ -39,6 +40,46 @@ func (generator *Markov) Generate() string {
 
 		builder.WriteRune(nextValue)
 	}
+}
+
+// LimitedGenerate return a random word using the Markov chain, with a maximum
+// number of tokens to generate before returning.
+//
+// Useful if the chain has a chance of entering infinite generation, or to simply
+// prevent an overly long word.
+func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err error) {
+	if maxTokens < generator.prefixLen {
+		err = errors.New("maxTokens cannot be less than the number of tokens used in the prefix")
+		return
+	}
+
+	var builder strings.Builder
+	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
+	lastRunes := []rune(starter)
+	lastRunesLen := len(lastRunes)
+	builder.WriteString(starter)
+
+	for i := generator.prefixLen; i < maxTokens; i++ {
+		key := string(lastRunes)
+		nextValues, nextValuesExist := generator.chain[key]
+
+		if !nextValuesExist {
+			break
+		}
+
+		nextValue := nextValues[rand.Intn(len(nextValues))]
+
+		for i := 0; i < lastRunesLen-1; i++ {
+			lastRunes[i] = lastRunes[i+1]
+		}
+		lastRunes[lastRunesLen-1] = nextValue
+
+		builder.WriteRune(nextValue)
+	}
+
+	output = builder.String()
+	return
+
 }
 
 // New feeds data to a markov chain and return the word generator.

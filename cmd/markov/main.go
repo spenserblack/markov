@@ -15,7 +15,9 @@ import (
 
 func main() {
 	var markov generator.Generator
+	var err error
 	prefixLen := flag.Int("n", 1, "number of tokens to use to map following token")
+	maxTokens := flag.Int("max", -1, "maximum number of tokens to generate. a negative number signifies no maximum")
 	genWord := flag.Bool("w", false, "generate a word instead of a sentence")
 	printHelp := flag.Bool("h", false, "print this help message")
 	flag.Parse()
@@ -47,7 +49,19 @@ func main() {
 		markov = sentence.New(strings.Split(feed, "\n"), *prefixLen)
 	}
 
-	fmt.Println(markov.Generate())
+	var output string
+
+	if *maxTokens < 0 {
+		output = markov.Generate()
+	} else {
+		output, err = markov.LimitedGenerate(*maxTokens)
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(output)
 }
 
 func init() {
