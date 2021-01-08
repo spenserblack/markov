@@ -23,8 +23,8 @@ func main() {
 	feedFile := flag.Arg(0)
 
 	if *printHelp || feedFile == "" {
-		println("usage: markov [OPTIONS] [TEXT]")
-		println("TEXT: the text to feed to the markov chain")
+		println("usage: markov [OPTIONS] [FILENAME]")
+		println("FILENAME: a text file containing newline-separated groups of tokens to feed into the markov chain")
 		flag.PrintDefaults()
 		return
 	}
