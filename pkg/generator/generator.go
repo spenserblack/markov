@@ -1,8 +1,7 @@
 package generator
 
-// To be implemented by types, specifically Markov chains, that generate a
-// random string output.
+// Generator is a type that uses a Markov chain to generate a randomized string.
 type Generator interface {
-	// Generate a random output using a Markov chain.
+	// Generate returns a random output using a Markov chain.
 	Generate() string
 }

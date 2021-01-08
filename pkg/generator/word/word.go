@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-// Markov chain container for creating a word.
+// Markov is a Markov chain container for creating a word.
 type Markov struct {
 	mutex         sync.Mutex
 	chain         map[string][]rune
@@ -14,7 +14,7 @@ type Markov struct {
 	prefixLen     int
 }
 
-// Generate a random word from the Markov chain.
+// Generate returns a random word using the Markov chain.
 func (generator *Markov) Generate() string {
 	var builder strings.Builder
 	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
@@ -41,7 +41,8 @@ func (generator *Markov) Generate() string {
 	}
 }
 
-// Feed data to create a Markov chain.
+// New feeds data to a markov chain and return the word generator.
+//
 // Each word in `words` should be a string of letters to be used when building the
 // chain -- order of the letters determines how each next letter in a generated
 // word is decided.

@@ -6,14 +6,14 @@ import (
 	"sync"
 )
 
-// Markov chain container for creating a sentence.
+// Markov is a Markov chain container for creating a sentence.
 type Markov struct {
 	mutex     sync.Mutex
 	chain     map[string][]string
 	prefixLen int
 }
 
-// Generate a random sentence from the Markov chain.
+// Generate returns a random sentence using the Markov chain.
 func (generator *Markov) Generate() string {
 	var builder strings.Builder
 	chainStarters := generator.chain[""]
@@ -42,7 +42,8 @@ func (generator *Markov) Generate() string {
 	}
 }
 
-// Feed data to create a Markov chain.
+// New feeds data to a markov chain and returns the sentence generator.
+//
 // Each sentence in `sentences` should be a string of space-separated words to
 // be used when building the chain -- order of the words determines how each next
 // word in a generated sentence is decided.
