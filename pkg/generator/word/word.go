@@ -7,6 +7,8 @@ import (
 	"sync"
 )
 
+const chainEnder rune = '\x00'
+
 // Markov is a Markov chain container for creating a word.
 type Markov struct {
 	mutex         sync.Mutex
@@ -32,6 +34,10 @@ func (generator *Markov) Generate() string {
 		}
 
 		nextValue := nextValues[rand.Intn(len(nextValues))]
+
+		if nextValue == chainEnder {
+			return builder.String()
+		}
 
 		for i := 0; i < lastRunesLen-1; i++ {
 			lastRunes[i] = lastRunes[i+1]
@@ -68,6 +74,10 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 		}
 
 		nextValue := nextValues[rand.Intn(len(nextValues))]
+
+		if nextValue == chainEnder {
+			break
+		}
 
 		for i := 0; i < lastRunesLen-1; i++ {
 			lastRunes[i] = lastRunes[i+1]
@@ -126,6 +136,11 @@ func New(words []string, prefixLen int) (generator *Markov) {
 				}
 				generator.mutex.Unlock()
 			}
+
+			lastPrefix := word[len(word)-adjustedPrefixLen : len(word)]
+			generator.mutex.Lock()
+			generator.chain[lastPrefix] = append(generator.chain[lastPrefix], chainEnder)
+			generator.mutex.Unlock()
 		}(word)
 	}
 
