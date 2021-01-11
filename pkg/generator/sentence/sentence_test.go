@@ -8,7 +8,12 @@ import (
 // TestMaximumHit creates a sentence generator that *would* generate too many tokens,
 // checks that generation stops when the set maximum number of tokens is reached instead.
 func TestMaximumHit(t *testing.T) {
-	generator := New([]string{"a b c d e f g"}, 1)
+	generator, err := New([]string{"a b c d e f g"}, 1)
+
+	if err != nil {
+		t.Fatalf(`Failed to create generator: %v`, err)
+	}
+
 	output, err := generator.LimitedGenerate(3)
 	wantedLength := len(strings.Split(output, " "))
 	if wantedLength != 3 || err != nil {
@@ -19,7 +24,12 @@ func TestMaximumHit(t *testing.T) {
 // TestTooSmallMax calls sentence.LimitedGenerate with a maximum that is less than
 // the generator's prefix length, checking for an error.
 func TestTooSmallMax(t *testing.T) {
-	generator := New([]string{"a b c d e f g"}, 3)
+	generator, err := New([]string{"a b c d e f g"}, 3)
+
+	if err != nil {
+		t.Fatalf(`Failed to create generator: %v`, err)
+	}
+
 	output, err := generator.LimitedGenerate(2)
 
 	if len(output) != 0 || err == nil {
