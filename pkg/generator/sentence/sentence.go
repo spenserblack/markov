@@ -141,7 +141,7 @@ func New(sentences []string, prefixLen int) (generator *Markov) {
 				}
 				generator.mutex.Unlock()
 			}
-			lastPrefix := strings.Join(splitWords[len(splitWords)-adjustedPrefixLen:len(splitWords)], " ")
+			lastPrefix := strings.Join(splitWords[len(splitWords)-adjustedPrefixLen:], " ")
 			generator.mutex.Lock()
 			generator.chain[lastPrefix] = append(generator.chain[lastPrefix], chainEnder)
 			generator.mutex.Unlock()

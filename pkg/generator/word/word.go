@@ -137,7 +137,7 @@ func New(words []string, prefixLen int) (generator *Markov) {
 				generator.mutex.Unlock()
 			}
 
-			lastPrefix := word[len(word)-adjustedPrefixLen : len(word)]
+			lastPrefix := word[len(word)-adjustedPrefixLen:]
 			generator.mutex.Lock()
 			generator.chain[lastPrefix] = append(generator.chain[lastPrefix], chainEnder)
 			generator.mutex.Unlock()
