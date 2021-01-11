@@ -44,9 +44,13 @@ func main() {
 	feed := string(feedBytes)
 
 	if *genWord {
-		markov = word.New(strings.Split(feed, "\n"), *prefixLen)
+		markov, err = word.New(strings.Split(feed, "\n"), *prefixLen)
 	} else {
-		markov = sentence.New(strings.Split(feed, "\n"), *prefixLen)
+		markov, err = sentence.New(strings.Split(feed, "\n"), *prefixLen)
+	}
+
+	if err != nil {
+		panic(err)
 	}
 
 	var output string

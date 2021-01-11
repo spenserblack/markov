@@ -103,7 +103,12 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 // word. For example, if `prefixLen` is 2 and the generated text is "I made a
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
-func New(sentences []string, prefixLen int) (generator *Markov) {
+func New(sentences []string, prefixLen int) (generator *Markov, err error) {
+	if prefixLen < 1 {
+		err = errors.New("prefixLen must be 1 or greater")
+		return
+	}
+
 	generator = new(Markov)
 	generator.chain = make(map[string][]string)
 	generator.prefixLen = prefixLen

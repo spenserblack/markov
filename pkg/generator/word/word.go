@@ -100,7 +100,12 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 // `prefixLen` is the number of letters to be used as a "key" to deciding the next
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
-func New(words []string, prefixLen int) (generator *Markov) {
+func New(words []string, prefixLen int) (generator *Markov, err error) {
+	if prefixLen < 1 {
+		err = errors.New("prefixLen must be 1 or greater")
+		return
+	}
+
 	generator = new(Markov)
 	generator.chain = make(map[string][]rune)
 	generator.prefixLen = prefixLen
