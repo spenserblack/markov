@@ -3,6 +3,7 @@ package generator
 import (
 	"crypto/sha1"
 	"errors"
+	"math/rand"
 	"sync"
 )
 
@@ -23,6 +24,40 @@ type MarkovGenerator struct {
 	chain         markovChain
 	chainStarters [][]byte
 	prefixLen     int
+}
+
+func (generator *MarkovGenerator) Generate() (output [][]byte) {
+	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
+	var lastBytes [][]byte = [][]byte{starter}
+	lastBytesLen := len(lastBytes)
+	output = append(output, starter)
+	h := sha1.New()
+
+	for ; ; h.Reset() {
+		for _, bytes := range lastBytes {
+			h.Write(bytes)
+		}
+		key := string(h.Sum(nil))
+
+		nextValues, nextValuesExist := generator.chain[key]
+
+		if !nextValuesExist {
+			return
+		}
+
+		var nextValue []byte = nextValues[rand.Intn(len(nextValues))]
+
+		if nextValue == nil {
+			return
+		}
+
+		for i := 0; i < lastBytesLen-1; i++ {
+			lastBytes[i] = lastBytes[i+1]
+		}
+		lastBytes[lastBytesLen-1] = nextValue
+
+		output = append(output, nextValue)
+	}
 }
 
 // New feeds data to a markov chain and returns the generator.
