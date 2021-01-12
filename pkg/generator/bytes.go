@@ -17,6 +17,12 @@ type ByteGenerator struct {
 	prefixLen     int
 }
 
+// Generate creates a randomized sequence of bytes using the Markov chain.
+//
+// The bytes are in a [][]byte. Each []byte is a token in the chain.
+//
+// For example, if Generate was used to create a random sentence, then each
+// []byte would a word in the sentence.
 func (generator *ByteGenerator) Generate() (output [][]byte) {
 	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
 
@@ -54,6 +60,16 @@ func (generator *ByteGenerator) Generate() (output [][]byte) {
 	}
 }
 
+// LimitedGenerate returns a random sequence of bytes using the Markov chain,
+// with a maximum number of []byte tokens to generate before returning.
+//
+// The bytes are in a [][]byte. Each []byte is a token in the chain.
+//
+// For example, if Generate was used to create a random sentence, then each
+// []byte would a word in the sentence.
+//
+// Useful if the chain has a chance of entering infinite generation, or to simply
+// prevent an overly long sequence of tokens.
 func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte, err error) {
 	if maxTokens < generator.prefixLen {
 		err = errors.New("maxTokens cannot be less than the number of tokens used in the prefix")
