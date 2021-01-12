@@ -92,5 +92,3 @@ func main() {
 	fmt.Println(word.New(words, 1).Generate())
 }
 ```
-
-[example input files]: ./examples/resources
