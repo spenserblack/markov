@@ -51,6 +51,48 @@ func (generator *ByteGenerator) Generate() (output [][]byte) {
 	}
 }
 
+func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte, err error) {
+	if maxTokens < generator.prefixLen {
+		err = errors.New("maxTokens cannot be less than the number of tokens used in the prefix")
+		return
+	}
+
+	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
+	var lastBytes [][]byte = [][]byte{starter}
+	lastBytesLen := len(lastBytes)
+	output = append(output, starter)
+	h := sha1.New()
+
+	for i := generator.prefixLen; i < maxTokens; i++ {
+		h.Reset()
+
+		for _, bytes := range lastBytes {
+			h.Write(bytes)
+		}
+		key := string(h.Sum(nil))
+
+		nextValues, nextValuesExist := generator.chain[key]
+
+		if !nextValuesExist {
+			return
+		}
+
+		var nextValue []byte = nextValues[rand.Intn(len(nextValues))]
+
+		if nextValue == nil {
+			return
+		}
+
+		for i := 0; i < lastBytesLen-1; i++ {
+			lastBytes[i] = lastBytes[i+1]
+		}
+		lastBytes[lastBytesLen-1] = nextValue
+
+		output = append(output, nextValue)
+	}
+	return
+}
+
 // New feeds data to a markov chain and returns the generator.
 //
 // The 3-Dimensional slice of bytes can be a bit confusing, but here's the
