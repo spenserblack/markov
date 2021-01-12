@@ -18,15 +18,15 @@ type Generator interface {
 
 type markovChain = map[string][][]byte
 
-// MarkovGenerator uses a Markov to create a randomized sequence of tokens.
-type MarkovGenerator struct {
+// ByteGenerator uses a Markov to create a randomized sequence of tokens.
+type ByteGenerator struct {
 	mutex         sync.Mutex
 	chain         markovChain
 	chainStarters [][]byte
 	prefixLen     int
 }
 
-func (generator *MarkovGenerator) Generate() (output [][]byte) {
+func (generator *ByteGenerator) Generate() (output [][]byte) {
 	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
 	var lastBytes [][]byte = [][]byte{starter}
 	lastBytesLen := len(lastBytes)
@@ -78,13 +78,13 @@ func (generator *MarkovGenerator) Generate() (output [][]byte) {
 //	{[]byte("Hello,"), []byte("World!")},
 //	{[]byte("Hello,"), []byte("Go!")},
 // }
-func New(feed [][][]byte, prefixLen int) (generator *MarkovGenerator, err error) {
+func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 	if prefixLen < 1 {
 		err = errors.New("prefixLen must be 1 or greater")
 		return
 	}
 
-	generator = new(MarkovGenerator)
+	generator = new(ByteGenerator)
 	generator.chain = make(markovChain)
 	generator.prefixLen = prefixLen
 
