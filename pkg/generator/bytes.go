@@ -138,11 +138,16 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 			defer waiter.Done()
 
 			var adjustedPrefixLen int
-			if prefixLen >= len(sequence) {
-				adjustedPrefixLen = len(sequence) - 1
+			if prefixLen > len(sequence) {
+				adjustedPrefixLen = len(sequence)
 			} else {
 				adjustedPrefixLen = prefixLen
 			}
+
+			var prefix [][]byte = sequence[:adjustedPrefixLen]
+			generator.mutex.Lock()
+			generator.chainStarters = append(generator.chainStarters, prefix)
+			generator.mutex.Unlock()
 
 			for i, suffix := range sequence[adjustedPrefixLen:] {
 				var prefix [][]byte = sequence[i : i+adjustedPrefixLen]
@@ -155,10 +160,6 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 				key := string(h.Sum(nil))
 
 				generator.mutex.Lock()
-				if i == 0 {
-					generator.chainStarters = append(generator.chainStarters, prefix)
-				}
-
 				generator.chain[key] = append(generator.chain[key], suffix)
 				generator.mutex.Unlock()
 			}
