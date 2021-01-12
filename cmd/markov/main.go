@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	var markov generator.Generator
+	var markov generator.StringGenerator
 	var err error
 	prefixLen := flag.Int("n", 1, "number of tokens to use to map following token")
 	maxTokens := flag.Int("max", -1, "maximum number of tokens to generate. a negative number signifies no maximum")
