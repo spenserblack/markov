@@ -39,11 +39,14 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 		return
 	}
 
-	for _, bytes := range bytes2d {
+	for _, bytes := range bytes2d[:len(bytes2d)-1] {
 		for _, b := range bytes {
 			builder.WriteByte(b)
 		}
 		builder.WriteRune(' ')
+	}
+	for _, b := range bytes2d[len(bytes2d)-1] {
+		builder.WriteByte(b)
 	}
 
 	output = builder.String()
