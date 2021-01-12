@@ -1,51 +1,28 @@
 package word
 
 import (
-	"errors"
-	"math/rand"
+	bytegenerator "github.com/spenserblack/markov/pkg/generator"
 	"strings"
 	"sync"
+	"unicode/utf8"
 )
-
-const chainEnder rune = '\x00'
 
 // Markov is a Markov chain container for creating a word.
 type Markov struct {
-	mutex         sync.Mutex
-	chain         map[string][]rune
-	chainStarters []string
-	prefixLen     int
+	generator *bytegenerator.ByteGenerator
 }
 
 // Generate returns a random word using the Markov chain.
 func (generator *Markov) Generate() string {
 	var builder strings.Builder
-	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
-	lastRunes := []rune(starter)
-	lastRunesLen := len(lastRunes)
-	builder.WriteString(starter)
 
-	for {
-		key := string(lastRunes)
-		nextValues, nextValuesExist := generator.chain[key]
-
-		if !nextValuesExist {
-			return builder.String()
+	for _, bytes := range generator.generator.Generate() {
+		for _, b := range bytes {
+			builder.WriteByte(b)
 		}
-
-		nextValue := nextValues[rand.Intn(len(nextValues))]
-
-		if nextValue == chainEnder {
-			return builder.String()
-		}
-
-		for i := 0; i < lastRunesLen-1; i++ {
-			lastRunes[i] = lastRunes[i+1]
-		}
-		lastRunes[lastRunesLen-1] = nextValue
-
-		builder.WriteRune(nextValue)
 	}
+
+	return builder.String()
 }
 
 // LimitedGenerate return a random word using the Markov chain, with a maximum
@@ -54,42 +31,23 @@ func (generator *Markov) Generate() string {
 // Useful if the chain has a chance of entering infinite generation, or to simply
 // prevent an overly long word.
 func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err error) {
-	if maxTokens < generator.prefixLen {
-		err = errors.New("maxTokens cannot be less than the number of tokens used in the prefix")
+	var builder strings.Builder
+
+	bytes2d, err := generator.generator.LimitedGenerate(maxTokens)
+
+	if err != nil {
 		return
 	}
 
-	var builder strings.Builder
-	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
-	lastRunes := []rune(starter)
-	lastRunesLen := len(lastRunes)
-	builder.WriteString(starter)
-
-	for i := generator.prefixLen; i < maxTokens; i++ {
-		key := string(lastRunes)
-		nextValues, nextValuesExist := generator.chain[key]
-
-		if !nextValuesExist {
-			break
+	for _, bytes := range bytes2d {
+		for _, b := range bytes {
+			builder.WriteByte(b)
 		}
-
-		nextValue := nextValues[rand.Intn(len(nextValues))]
-
-		if nextValue == chainEnder {
-			break
-		}
-
-		for i := 0; i < lastRunesLen-1; i++ {
-			lastRunes[i] = lastRunes[i+1]
-		}
-		lastRunes[lastRunesLen-1] = nextValue
-
-		builder.WriteRune(nextValue)
 	}
 
 	output = builder.String()
-	return
 
+	return
 }
 
 // New feeds data to a markov chain and return the word generator.
@@ -101,54 +59,34 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
 func New(words []string, prefixLen int) (generator *Markov, err error) {
-	if prefixLen < 1 {
-		err = errors.New("prefixLen must be 1 or greater")
-		return
-	}
-
 	generator = new(Markov)
-	generator.chain = make(map[string][]rune)
-	generator.prefixLen = prefixLen
+
+	bytes := make([][][]byte, len(words), len(words))
+
 	var waiter sync.WaitGroup
 
-	for _, word := range words {
-		// Let waiter know that goroutine will start
+	for i, word := range words {
 		waiter.Add(1)
-
-		go func(word string) {
-			// Let waiter know that goroutine has finished
+		go func(index int, word string) {
 			defer waiter.Done()
 
-			var adjustedPrefixLen int
-			if wordLen := len(word); prefixLen >= wordLen {
-				adjustedPrefixLen = wordLen - 1
-			} else {
-				adjustedPrefixLen = prefixLen
+			runes := []rune(word)
+			runesAsBytes := make([][]byte, len(runes), len(runes))
+
+			for i, r := range runes {
+				runeLen := utf8.RuneLen(r)
+				buf := make([]byte, runeLen, runeLen)
+				utf8.EncodeRune(buf, r)
+				runesAsBytes[i] = buf
 			}
 
-			for i, suffix := range word[adjustedPrefixLen:] {
-				prefix := word[i : i+adjustedPrefixLen]
-
-				generator.mutex.Lock()
-				if i == 0 {
-					generator.chainStarters = append(generator.chainStarters, prefix)
-				}
-
-				if suffixes, ok := generator.chain[prefix]; ok {
-					generator.chain[prefix] = append(suffixes, suffix)
-				} else {
-					generator.chain[prefix] = []rune{suffix}
-				}
-				generator.mutex.Unlock()
-			}
-
-			lastPrefix := word[len(word)-adjustedPrefixLen:]
-			generator.mutex.Lock()
-			generator.chain[lastPrefix] = append(generator.chain[lastPrefix], chainEnder)
-			generator.mutex.Unlock()
-		}(word)
+			bytes[index] = runesAsBytes
+		}(i, word)
 	}
 
 	waiter.Wait()
+
+	generator.generator, err = bytegenerator.New(bytes, prefixLen)
+
 	return
 }
