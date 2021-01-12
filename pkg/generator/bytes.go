@@ -13,19 +13,27 @@ type markovChain = map[string][][]byte
 type ByteGenerator struct {
 	mutex         sync.Mutex
 	chain         markovChain
-	chainStarters [][]byte
+	chainStarters [][][]byte
 	prefixLen     int
 }
 
 func (generator *ByteGenerator) Generate() (output [][]byte) {
 	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
-	var lastBytes [][]byte = [][]byte{starter}
-	lastBytesLen := len(lastBytes)
-	output = append(output, starter)
+
+	output = starter
+
 	h := sha1.New()
 
 	for ; ; h.Reset() {
-		for _, bytes := range lastBytes {
+		var adjustedPrefixLen int
+
+		if generator.prefixLen >= len(output) {
+			adjustedPrefixLen = len(output)
+		} else {
+			adjustedPrefixLen = generator.prefixLen
+		}
+
+		for _, bytes := range output[len(output)-adjustedPrefixLen:] {
 			h.Write(bytes)
 		}
 		key := string(h.Sum(nil))
@@ -41,11 +49,6 @@ func (generator *ByteGenerator) Generate() (output [][]byte) {
 		if nextValue == nil {
 			return
 		}
-
-		for i := 0; i < lastBytesLen-1; i++ {
-			lastBytes[i] = lastBytes[i+1]
-		}
-		lastBytes[lastBytesLen-1] = nextValue
 
 		output = append(output, nextValue)
 	}
@@ -58,15 +61,23 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 	}
 
 	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
-	var lastBytes [][]byte = [][]byte{starter}
-	lastBytesLen := len(lastBytes)
-	output = append(output, starter)
+
+	output = starter
+
 	h := sha1.New()
 
 	for i := generator.prefixLen; i < maxTokens; i++ {
 		h.Reset()
 
-		for _, bytes := range lastBytes {
+		var adjustedPrefixLen int
+
+		if generator.prefixLen >= len(output) {
+			adjustedPrefixLen = len(output)
+		} else {
+			adjustedPrefixLen = generator.prefixLen
+		}
+
+		for _, bytes := range output[len(output)-adjustedPrefixLen:] {
 			h.Write(bytes)
 		}
 		key := string(h.Sum(nil))
@@ -82,11 +93,6 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 		if nextValue == nil {
 			return
 		}
-
-		for i := 0; i < lastBytesLen-1; i++ {
-			lastBytes[i] = lastBytes[i+1]
-		}
-		lastBytes[lastBytesLen-1] = nextValue
 
 		output = append(output, nextValue)
 	}
@@ -142,21 +148,15 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 				var prefix [][]byte = sequence[i : i+adjustedPrefixLen]
 				h := sha1.New()
 
-				var flattenedByteSlice []byte
-
 				for _, byteSlice := range prefix {
-					for _, b := range byteSlice {
-						flattenedByteSlice = append(flattenedByteSlice, b)
-					}
+					h.Write(byteSlice)
 				}
-
-				h.Write(flattenedByteSlice)
 
 				key := string(h.Sum(nil))
 
 				generator.mutex.Lock()
 				if i == 0 {
-					generator.chainStarters = append(generator.chainStarters, flattenedByteSlice)
+					generator.chainStarters = append(generator.chainStarters, prefix)
 				}
 
 				generator.chain[key] = append(generator.chain[key], suffix)
