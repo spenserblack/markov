@@ -1,52 +1,28 @@
 package sentence
 
 import (
-	"errors"
-	"math/rand"
+	bytegenerator "github.com/spenserblack/markov/pkg/generator"
 	"strings"
 	"sync"
 )
 
-const chainEnder string = "\x00"
-
 // Markov is a Markov chain container for creating a sentence.
 type Markov struct {
-	mutex     sync.Mutex
-	chain     map[string][]string
-	prefixLen int
+	generator *bytegenerator.ByteGenerator
 }
 
 // Generate returns a random sentence using the Markov chain.
 func (generator *Markov) Generate() string {
 	var builder strings.Builder
-	chainStarters := generator.chain[""]
-	starter := chainStarters[rand.Intn(len(chainStarters))]
-	lastWords := strings.Split(starter, " ")
-	lastWordsLen := len(lastWords)
-	builder.WriteString(starter)
 
-	for {
-		key := strings.Join(lastWords, " ")
-		nextValues, nextValuesExist := generator.chain[key]
-
-		if !nextValuesExist {
-			return builder.String()
+	for _, bytes := range generator.generator.Generate() {
+		for _, b := range bytes {
+			builder.WriteByte(b)
 		}
-
-		nextValue := nextValues[rand.Intn(len(nextValues))]
-
-		if nextValue == chainEnder {
-			return builder.String()
-		}
-
-		for i := 0; i < lastWordsLen-1; i++ {
-			lastWords[i] = lastWords[i+1]
-		}
-		lastWords[lastWordsLen-1] = nextValue
-
 		builder.WriteRune(' ')
-		builder.WriteString(nextValue)
 	}
+
+	return builder.String()
 }
 
 // LimitedGenerate return a random sentence using the Markov chain, with a maximum
@@ -55,42 +31,23 @@ func (generator *Markov) Generate() string {
 // Useful if the chain has a chance of entering infinite generation, or to simply
 // prevent an overly long sentence.
 func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err error) {
-	if maxTokens < generator.prefixLen {
-		err = errors.New("maxTokens cannot be less than the number of tokens used in the prefix")
+	var builder strings.Builder
+
+	bytes2d, err := generator.generator.LimitedGenerate(maxTokens)
+
+	if err != nil {
 		return
 	}
 
-	var builder strings.Builder
-	chainStarters := generator.chain[""]
-	starter := chainStarters[rand.Intn(len(chainStarters))]
-	lastWords := strings.Split(starter, " ")
-	lastWordsLen := len(lastWords)
-	builder.WriteString(starter)
-
-	for i := generator.prefixLen; i < maxTokens; i++ {
-		key := strings.Join(lastWords, " ")
-		nextValues, nextValuesExist := generator.chain[key]
-
-		if !nextValuesExist {
-			break
+	for _, bytes := range bytes2d {
+		for _, b := range bytes {
+			builder.WriteByte(b)
 		}
-
-		nextValue := nextValues[rand.Intn(len(nextValues))]
-
-		if nextValue == chainEnder {
-			break
-		}
-
-		for i := 0; i < lastWordsLen-1; i++ {
-			lastWords[i] = lastWords[i+1]
-		}
-		lastWords[lastWordsLen-1] = nextValue
-
 		builder.WriteRune(' ')
-		builder.WriteString(nextValue)
 	}
 
 	output = builder.String()
+
 	return
 }
 
@@ -104,55 +61,28 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
 func New(sentences []string, prefixLen int) (generator *Markov, err error) {
-	if prefixLen < 1 {
-		err = errors.New("prefixLen must be 1 or greater")
-		return
-	}
-
 	generator = new(Markov)
-	generator.chain = make(map[string][]string)
-	generator.prefixLen = prefixLen
+
+	bytes := make([][][]byte, len(sentences), len(sentences))
 	var waiter sync.WaitGroup
 
-	for _, words := range sentences {
-		// Let waiter know that goroutine will start
+	for i, sentence := range sentences {
 		waiter.Add(1)
-
-		go func(sentence string) {
-			// Let waiter know that goroutine has finished
+		go func(index int, sentence string) {
 			defer waiter.Done()
 
-			splitWords := strings.Split(sentence, " ")
+			words := strings.Split(sentence, " ")
 
-			var adjustedPrefixLen int
-			if splitWordsLen := len(splitWords); prefixLen >= splitWordsLen {
-				adjustedPrefixLen = splitWordsLen - 1
-			} else {
-				adjustedPrefixLen = prefixLen
+			for _, word := range words {
+				bytes[index] = append(bytes[index], []byte(word))
 			}
 
-			for i, suffix := range splitWords[adjustedPrefixLen:] {
-				prefix := strings.Join(splitWords[i:i+adjustedPrefixLen], " ")
-
-				generator.mutex.Lock()
-				if i == 0 {
-					generator.chain[""] = append(generator.chain[""], prefix)
-				}
-
-				if suffixes, ok := generator.chain[prefix]; ok {
-					generator.chain[prefix] = append(suffixes, suffix)
-				} else {
-					generator.chain[prefix] = []string{suffix}
-				}
-				generator.mutex.Unlock()
-			}
-			lastPrefix := strings.Join(splitWords[len(splitWords)-adjustedPrefixLen:], " ")
-			generator.mutex.Lock()
-			generator.chain[lastPrefix] = append(generator.chain[lastPrefix], chainEnder)
-			generator.mutex.Unlock()
-		}(words)
+		}(i, sentence)
 	}
 
 	waiter.Wait()
+
+	generator.generator, err = bytegenerator.New(bytes, prefixLen)
+
 	return
 }
