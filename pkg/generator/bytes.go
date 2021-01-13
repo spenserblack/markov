@@ -78,7 +78,13 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 
 	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
 
-	output = starter
+	output = make([][]byte, maxTokens, maxTokens)
+	outputIndex := copy(output, starter)
+
+	// Shrink output to the final length
+	defer func() {
+		output = output[:outputIndex]
+	}()
 
 	h := sha1.New()
 
@@ -87,13 +93,13 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 
 		var adjustedPrefixLen int
 
-		if generator.prefixLen >= len(output) {
-			adjustedPrefixLen = len(output)
+		if generator.prefixLen >= outputIndex {
+			adjustedPrefixLen = outputIndex
 		} else {
 			adjustedPrefixLen = generator.prefixLen
 		}
 
-		for _, bytes := range output[len(output)-adjustedPrefixLen:] {
+		for _, bytes := range output[outputIndex-adjustedPrefixLen:] {
 			h.Write(bytes)
 		}
 		key := string(h.Sum(nil))
@@ -110,7 +116,8 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 			return
 		}
 
-		output = append(output, nextValue)
+		output[outputIndex] = nextValue
+		outputIndex++
 	}
 	return
 }
