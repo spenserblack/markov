@@ -1,18 +1,17 @@
 package sentence
 
 import (
-	bytegenerator "github.com/spenserblack/markov/pkg/generator"
+	gen "github.com/spenserblack/markov/pkg/generator"
 	"strings"
 	"sync"
 )
 
-// Markov is a Markov chain container for creating a sentence.
-type Markov struct {
-	generator *bytegenerator.ByteGenerator
+type sentenceGenerator struct {
+	generator *gen.ByteGenerator
 }
 
 // Generate returns a random sentence using the Markov chain.
-func (generator *Markov) Generate() string {
+func (generator *sentenceGenerator) Generate() string {
 	var builder strings.Builder
 
 	for _, bytes := range generator.generator.Generate() {
@@ -30,7 +29,7 @@ func (generator *Markov) Generate() string {
 //
 // Useful if the chain has a chance of entering infinite generation, or to simply
 // prevent an overly long sentence.
-func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err error) {
+func (generator *sentenceGenerator) LimitedGenerate(maxTokens int) (output string, err error) {
 	var builder strings.Builder
 
 	bytes2d, err := generator.generator.LimitedGenerate(maxTokens)
@@ -63,8 +62,8 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 // word. For example, if `prefixLen` is 2 and the generated text is "I made a
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
-func New(sentences []string, prefixLen int) (generator *Markov, err error) {
-	generator = new(Markov)
+func New(sentences []string, prefixLen int) (generator gen.StringGenerator, err error) {
+	g := new(sentenceGenerator)
 
 	bytes := make([][][]byte, len(sentences), len(sentences))
 	var waiter sync.WaitGroup
@@ -85,7 +84,8 @@ func New(sentences []string, prefixLen int) (generator *Markov, err error) {
 
 	waiter.Wait()
 
-	generator.generator, err = bytegenerator.New(bytes, prefixLen)
+	g.generator, err = gen.New(bytes, prefixLen)
+	generator = g
 
 	return
 }

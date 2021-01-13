@@ -1,19 +1,18 @@
 package word
 
 import (
-	bytegenerator "github.com/spenserblack/markov/pkg/generator"
+	gen "github.com/spenserblack/markov/pkg/generator"
 	"strings"
 	"sync"
 	"unicode/utf8"
 )
 
-// Markov is a Markov chain container for creating a word.
-type Markov struct {
-	generator *bytegenerator.ByteGenerator
+type wordGenerator struct {
+	generator *gen.ByteGenerator
 }
 
 // Generate returns a random word using the Markov chain.
-func (generator *Markov) Generate() string {
+func (generator *wordGenerator) Generate() string {
 	var builder strings.Builder
 
 	for _, bytes := range generator.generator.Generate() {
@@ -30,7 +29,7 @@ func (generator *Markov) Generate() string {
 //
 // Useful if the chain has a chance of entering infinite generation, or to simply
 // prevent an overly long word.
-func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err error) {
+func (generator *wordGenerator) LimitedGenerate(maxTokens int) (output string, err error) {
 	var builder strings.Builder
 
 	bytes2d, err := generator.generator.LimitedGenerate(maxTokens)
@@ -58,8 +57,8 @@ func (generator *Markov) LimitedGenerate(maxTokens int) (output string, err erro
 // `prefixLen` is the number of letters to be used as a "key" to deciding the next
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
-func New(words []string, prefixLen int) (generator *Markov, err error) {
-	generator = new(Markov)
+func New(words []string, prefixLen int) (generator gen.StringGenerator, err error) {
+	g := new(wordGenerator)
 
 	bytes := make([][][]byte, len(words), len(words))
 
@@ -86,7 +85,8 @@ func New(words []string, prefixLen int) (generator *Markov, err error) {
 
 	waiter.Wait()
 
-	generator.generator, err = bytegenerator.New(bytes, prefixLen)
+	g.generator, err = gen.New(bytes, prefixLen)
+	generator = g
 
 	return
 }
