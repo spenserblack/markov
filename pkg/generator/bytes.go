@@ -141,6 +141,8 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 
 	generator = new(ByteGenerator)
 	generator.chain = make(markovChain)
+	generator.chainStarters = make([][][]byte, len(feed), len(feed))
+	chainStarterCounter := 0
 	generator.prefixLen = prefixLen
 
 	var waiter sync.WaitGroup
@@ -162,7 +164,8 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 
 			var prefix [][]byte = sequence[:adjustedPrefixLen]
 			generator.mutex.Lock()
-			generator.chainStarters = append(generator.chainStarters, prefix)
+			generator.chainStarters[chainStarterCounter] = prefix
+			chainStarterCounter++
 			generator.mutex.Unlock()
 
 			for i, suffix := range sequence[adjustedPrefixLen:] {
