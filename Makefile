@@ -1,4 +1,4 @@
-.PHONY: clean test
+.PHONY: clean test vet
 
 markov:
 	go build -o markov cmd/markov/main.go
@@ -8,3 +8,6 @@ clean:
 
 test:
 	go test ./...
+
+vet:
+	go vet ./...
