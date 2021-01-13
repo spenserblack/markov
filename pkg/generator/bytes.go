@@ -161,6 +161,7 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 		go func(sequence [][]byte) {
 			// Let waiter know that goroutine has finished
 			defer waiter.Done()
+			h := sha1.New()
 
 			var adjustedPrefixLen int
 			if prefixLen > len(sequence) {
@@ -177,7 +178,6 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 
 			for i, suffix := range sequence[adjustedPrefixLen:] {
 				var prefix [][]byte = sequence[i : i+adjustedPrefixLen]
-				h := sha1.New()
 
 				for _, byteSlice := range prefix {
 					h.Write(byteSlice)
@@ -188,10 +188,10 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 				generator.mutex.Lock()
 				generator.chain[key] = append(generator.chain[key], suffix)
 				generator.mutex.Unlock()
+				h.Reset()
 			}
 
 			var lastPrefix [][]byte = sequence[len(sequence)-adjustedPrefixLen:]
-			h := sha1.New()
 			for _, byteSlice := range lastPrefix {
 				h.Write(byteSlice)
 			}
