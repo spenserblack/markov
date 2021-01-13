@@ -9,7 +9,7 @@ import (
 
 type markovChain = map[string][][]byte
 
-// ByteGenerator uses a Markov to create a randomized sequence of tokens.
+// ByteGenerator uses a Markov chain to create a randomized sequence of tokens.
 type ByteGenerator struct {
 	mutex         sync.Mutex
 	chain         markovChain
@@ -127,12 +127,12 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 // The 3-Dimensional slice of bytes can be a bit confusing, but here's the
 // logic behind it:
 //
-// - The 1st dimension is the list of inputs. For example, a list of sentences.
+// - The 3rd dimension is the list of inputs. For example, a list of sentences.
 //
 // - The 2nd dimension is the split inputs. For example, the words making up a
 // sentence.
 //
-// - The 3rd dimension are the particles that each token is composed of. For
+// - The 1st dimension are the particles that each token is composed of. For
 // example, the letters in a word.
 //
 // So, if you want to feed the sentences "Hello, World!" and "Hello, Go!" into
