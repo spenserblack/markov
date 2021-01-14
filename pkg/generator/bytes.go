@@ -78,13 +78,10 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 
 	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
 
-	output = make([][]byte, maxTokens, maxTokens)
-	outputIndex := copy(output, starter)
+	output = make([][]byte, 0, maxTokens)
+	output = append(output, starter...)
 
 	// Shrink output to the final length
-	defer func() {
-		output = output[:outputIndex]
-	}()
 
 	h := sha1.New()
 
@@ -93,13 +90,13 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 
 		var adjustedPrefixLen int
 
-		if generator.prefixLen >= outputIndex {
-			adjustedPrefixLen = outputIndex
+		if generator.prefixLen >= len(output) {
+			adjustedPrefixLen = len(output)
 		} else {
 			adjustedPrefixLen = generator.prefixLen
 		}
 
-		for _, bytes := range output[outputIndex-adjustedPrefixLen:] {
+		for _, bytes := range output[len(output)-adjustedPrefixLen:] {
 			h.Write(bytes)
 		}
 		key := string(h.Sum(nil))
@@ -116,8 +113,7 @@ func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte,
 			return
 		}
 
-		output[outputIndex] = nextValue
-		outputIndex++
+		output = append(output, nextValue)
 	}
 	return
 }
@@ -148,8 +144,7 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 
 	generator = new(ByteGenerator)
 	generator.chain = make(markovChain)
-	generator.chainStarters = make([][][]byte, len(feed), len(feed))
-	chainStarterCounter := 0
+	generator.chainStarters = make([][][]byte, 0, len(feed))
 	generator.prefixLen = prefixLen
 
 	var waiter sync.WaitGroup
@@ -172,8 +167,7 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 
 			var prefix [][]byte = sequence[:adjustedPrefixLen]
 			generator.mutex.Lock()
-			generator.chainStarters[chainStarterCounter] = prefix
-			chainStarterCounter++
+			generator.chainStarters = append(generator.chainStarters, prefix)
 			generator.mutex.Unlock()
 
 			for i, suffix := range sequence[adjustedPrefixLen:] {

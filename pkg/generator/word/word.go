@@ -70,13 +70,13 @@ func New(words []string, prefixLen int) (generator gen.StringGenerator, err erro
 			defer waiter.Done()
 
 			runes := []rune(word)
-			runesAsBytes := make([][]byte, len(runes), len(runes))
+			runesAsBytes := make([][]byte, 0, len(runes))
 
-			for i, r := range runes {
+			for _, r := range runes {
 				runeLen := utf8.RuneLen(r)
 				buf := make([]byte, runeLen, runeLen)
 				utf8.EncodeRune(buf, r)
-				runesAsBytes[i] = buf
+				runesAsBytes = append(runesAsBytes, buf)
 			}
 
 			bytes[index] = runesAsBytes
