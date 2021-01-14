@@ -74,6 +74,7 @@ func New(sentences []string, prefixLen int) (generator gen.StringGenerator, err 
 			defer waiter.Done()
 
 			words := strings.Split(sentence, " ")
+			bytes[index] = make([][]byte, 0, len(words))
 
 			for _, word := range words {
 				bytes[index] = append(bytes[index], []byte(word))
