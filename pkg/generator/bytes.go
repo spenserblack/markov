@@ -11,7 +11,6 @@ type markovChain = map[string][][]byte
 
 // ByteGenerator uses a Markov chain to create a randomized sequence of tokens.
 type ByteGenerator struct {
-	mutex         sync.Mutex
 	chain         markovChain
 	chainStarters [][][]byte
 }
@@ -87,6 +86,7 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 	generator = new(ByteGenerator)
 	generator.chain = make(markovChain)
 	generator.chainStarters = make([][][]byte, 0, len(feed))
+	var chainMutex, chainStarterMutex sync.Mutex
 
 	var waiter sync.WaitGroup
 
@@ -107,9 +107,9 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 			}
 
 			var prefix [][]byte = sequence[:adjustedPrefixLen]
-			generator.mutex.Lock()
+			chainStarterMutex.Lock()
 			generator.chainStarters = append(generator.chainStarters, prefix)
-			generator.mutex.Unlock()
+			chainStarterMutex.Unlock()
 
 			for i, suffix := range sequence[adjustedPrefixLen:] {
 				var prefix [][]byte = sequence[i : i+adjustedPrefixLen]
@@ -120,9 +120,9 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 
 				key := string(h.Sum(nil))
 
-				generator.mutex.Lock()
+				chainMutex.Lock()
 				generator.chain[key] = append(generator.chain[key], suffix)
-				generator.mutex.Unlock()
+				chainMutex.Unlock()
 				h.Reset()
 			}
 
@@ -132,9 +132,9 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 			}
 			key := string(h.Sum(nil))
 
-			generator.mutex.Lock()
+			chainMutex.Lock()
 			generator.chain[key] = append(generator.chain[key], nil)
-			generator.mutex.Unlock()
+			chainMutex.Unlock()
 
 		}(sequence)
 	}
