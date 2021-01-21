@@ -14,7 +14,6 @@ type ByteGenerator struct {
 	mutex         sync.Mutex
 	chain         markovChain
 	chainStarters [][][]byte
-	prefixLen     int
 }
 
 // Generate creates a randomized sequence of bytes using the Markov chain.
@@ -88,7 +87,6 @@ func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 	generator = new(ByteGenerator)
 	generator.chain = make(markovChain)
 	generator.chainStarters = make([][][]byte, 0, len(feed))
-	generator.prefixLen = prefixLen
 
 	var waiter sync.WaitGroup
 
