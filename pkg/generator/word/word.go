@@ -14,8 +14,11 @@ type wordGenerator struct {
 // Generate returns a random word using the Markov chain.
 func (generator *wordGenerator) Generate() string {
 	var builder strings.Builder
+	c := make(chan []byte)
 
-	for _, bytes := range generator.generator.Generate() {
+	go generator.generator.Generate(c)
+
+	for bytes := range c {
 		for _, b := range bytes {
 			builder.WriteByte(b)
 		}
@@ -31,22 +34,22 @@ func (generator *wordGenerator) Generate() string {
 // prevent an overly long word.
 func (generator *wordGenerator) LimitedGenerate(maxTokens int) (output string, err error) {
 	var builder strings.Builder
+	tokenCounter := 1
+	c := make(chan []byte)
 
-	bytes2d, err := generator.generator.LimitedGenerate(maxTokens)
+	go generator.generator.Generate(c)
 
-	if err != nil {
-		return
-	}
-
-	for _, bytes := range bytes2d {
+	for bytes := range c {
 		for _, b := range bytes {
 			builder.WriteByte(b)
 		}
+		if tokenCounter == maxTokens {
+			break
+		}
+		tokenCounter++
 	}
 
-	output = builder.String()
-
-	return
+	return builder.String(), nil
 }
 
 // New feeds data to a markov chain and return the word generator.

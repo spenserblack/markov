@@ -13,8 +13,11 @@ type sentenceGenerator struct {
 // Generate returns a random sentence using the Markov chain.
 func (generator *sentenceGenerator) Generate() string {
 	var builder strings.Builder
+	c := make(chan []byte)
 
-	for _, bytes := range generator.generator.Generate() {
+	go generator.generator.Generate(c)
+
+	for bytes := range c {
 		for _, b := range bytes {
 			builder.WriteByte(b)
 		}
@@ -31,26 +34,23 @@ func (generator *sentenceGenerator) Generate() string {
 // prevent an overly long sentence.
 func (generator *sentenceGenerator) LimitedGenerate(maxTokens int) (output string, err error) {
 	var builder strings.Builder
+	tokenCounter := 1
+	c := make(chan []byte)
 
-	bytes2d, err := generator.generator.LimitedGenerate(maxTokens)
+	go generator.generator.Generate(c)
 
-	if err != nil {
-		return
-	}
-
-	for _, bytes := range bytes2d[:len(bytes2d)-1] {
+	for bytes := range c {
 		for _, b := range bytes {
 			builder.WriteByte(b)
 		}
+		if tokenCounter == maxTokens {
+			break
+		}
 		builder.WriteRune(' ')
-	}
-	for _, b := range bytes2d[len(bytes2d)-1] {
-		builder.WriteByte(b)
+		tokenCounter++
 	}
 
-	output = builder.String()
-
-	return
+	return builder.String(), nil
 }
 
 // New feeds data to a markov chain and returns the sentence generator.

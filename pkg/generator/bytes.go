@@ -19,27 +19,23 @@ type ByteGenerator struct {
 
 // Generate creates a randomized sequence of bytes using the Markov chain.
 //
-// The bytes are in a [][]byte. Each []byte is a token in the chain.
+// Each []byte is a token in the chain.
 //
 // For example, if Generate was used to create a random sentence, then each
 // []byte would a word in the sentence.
-func (generator *ByteGenerator) Generate() (output [][]byte) {
-	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
+func (generator *ByteGenerator) Generate(c chan []byte) {
+	defer close(c)
 
-	output = starter
+	lastBytes := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
+
+	for _, bytes := range lastBytes {
+		c <- bytes
+	}
 
 	h := sha1.New()
 
 	for ; ; h.Reset() {
-		var adjustedPrefixLen int
-
-		if generator.prefixLen >= len(output) {
-			adjustedPrefixLen = len(output)
-		} else {
-			adjustedPrefixLen = generator.prefixLen
-		}
-
-		for _, bytes := range output[len(output)-adjustedPrefixLen:] {
+		for _, bytes := range lastBytes {
 			h.Write(bytes)
 		}
 		key := string(h.Sum(nil))
@@ -56,66 +52,13 @@ func (generator *ByteGenerator) Generate() (output [][]byte) {
 			return
 		}
 
-		output = append(output, nextValue)
+		c <- nextValue
+
+		for i, v := range lastBytes[1:] {
+			lastBytes[i] = v
+		}
+		lastBytes[len(lastBytes)-1] = nextValue
 	}
-}
-
-// LimitedGenerate returns a random sequence of bytes using the Markov chain,
-// with a maximum number of []byte tokens to generate before returning.
-//
-// The bytes are in a [][]byte. Each []byte is a token in the chain.
-//
-// For example, if Generate was used to create a random sentence, then each
-// []byte would a word in the sentence.
-//
-// Useful if the chain has a chance of entering infinite generation, or to simply
-// prevent an overly long sequence of tokens.
-func (generator *ByteGenerator) LimitedGenerate(maxTokens int) (output [][]byte, err error) {
-	if maxTokens < generator.prefixLen {
-		err = errors.New("maxTokens cannot be less than the number of tokens used in the prefix")
-		return
-	}
-
-	starter := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
-
-	output = make([][]byte, 0, maxTokens)
-	output = append(output, starter...)
-
-	// Shrink output to the final length
-
-	h := sha1.New()
-
-	for i := generator.prefixLen; i < maxTokens; i++ {
-		h.Reset()
-
-		var adjustedPrefixLen int
-
-		if generator.prefixLen >= len(output) {
-			adjustedPrefixLen = len(output)
-		} else {
-			adjustedPrefixLen = generator.prefixLen
-		}
-
-		for _, bytes := range output[len(output)-adjustedPrefixLen:] {
-			h.Write(bytes)
-		}
-		key := string(h.Sum(nil))
-
-		nextValues, nextValuesExist := generator.chain[key]
-
-		if !nextValuesExist {
-			return
-		}
-
-		var nextValue []byte = nextValues[rand.Intn(len(nextValues))]
-
-		if nextValue == nil {
-			return
-		}
-
-		output = append(output, nextValue)
-	}
-	return
 }
 
 // New feeds data to a markov chain and returns the generator.
