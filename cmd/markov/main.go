@@ -53,13 +53,7 @@ func main() {
 		panic(err)
 	}
 
-	var output string
-
-	if *maxTokens < 0 {
-		output = markov.Generate()
-	} else {
-		output, err = markov.LimitedGenerate(*maxTokens)
-	}
+	output := markov.Generate(*maxTokens)
 
 	if err != nil {
 		panic(err)

@@ -11,9 +11,9 @@ func TestMaximumHit(t *testing.T) {
 		t.Fatalf(`Failed to create generator: %v`, err)
 	}
 
-	output, err := generator.LimitedGenerate(3)
+	output := generator.Generate(3)
 	want := "abc"
 	if output != want || err != nil {
-		t.Fatalf(`LimitedGenerate(3) = %q, %v, want %q, nil`, output, err, want)
+		t.Fatalf(`Generate(3) = %q, %v, want %q, nil`, output, err, want)
 	}
 }

@@ -11,31 +11,16 @@ type sentenceGenerator struct {
 }
 
 // Generate returns a random sentence using the Markov chain.
-func (generator *sentenceGenerator) Generate() string {
-	var builder strings.Builder
-	c := make(chan []byte)
-
-	go generator.generator.Generate(c)
-
-	for bytes := range c {
-		for _, b := range bytes {
-			builder.WriteByte(b)
-		}
-		builder.WriteRune(' ')
-	}
-
-	return builder.String()
-}
-
-// LimitedGenerate return a random sentence using the Markov chain, with a maximum
-// number of tokens to generate before returning.
 //
-// Useful if the chain has a chance of entering infinite generation, or to simply
-// prevent an overly long sentence.
-func (generator *sentenceGenerator) LimitedGenerate(maxTokens int) (output string, err error) {
+// If maxTokens is <= 0, then generation will continue until its "natural"
+// end from the chain deciding that a token should end the chain.
+// Enforcing a maximum number of tokens can be helpful if the chain has a
+// chance of generating infinitely, or to simply prevent the generated
+// sentence from being overly long.
+func (generator *sentenceGenerator) Generate(maxTokens int) string {
 	var builder strings.Builder
-	tokenCounter := 1
 	c := make(chan []byte)
+	tokenCounter := 1
 
 	go generator.generator.Generate(c)
 
@@ -50,7 +35,7 @@ func (generator *sentenceGenerator) LimitedGenerate(maxTokens int) (output strin
 		tokenCounter++
 	}
 
-	return builder.String(), nil
+	return builder.String()
 }
 
 // New feeds data to a markov chain and returns the sentence generator.

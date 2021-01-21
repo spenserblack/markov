@@ -14,9 +14,9 @@ func TestMaximumHit(t *testing.T) {
 		t.Fatalf(`Failed to create generator: %v`, err)
 	}
 
-	output, err := generator.LimitedGenerate(3)
+	output := generator.Generate(3)
 	wantedLength := len(strings.Split(output, " "))
 	if wantedLength != 3 || err != nil {
-		t.Fatalf(`LimitedGenerate(3) = %q, %v, want <string of length 3>, nil`, output, err)
+		t.Fatalf(`Generate(3) = %q, %v, want <string of length 3>, nil`, output, err)
 	}
 }
