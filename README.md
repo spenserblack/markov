@@ -19,7 +19,7 @@ make markov
 ## Binary Usage
 
 The binary takes a filename which should point to a file containing tokens
-that should be fed to the chain separated by newlines (see the [example input files]).
+that should be fed to the chain separated by newlines.
 
 ```bash
 # print help
@@ -38,9 +38,6 @@ markov -n <token number> <remaining args>
 ## Use in your Go project
 
 *This project uses `math/rand`. You may want to use `math/rand.Seed` to get more random results.*
-
-*If you don't know until runtime if a random sentence or random word should be generated, the
-`github.com/spenserblack/markov/pkg/generator.Generator` interface can be used.*
 
 ### Generate random sentence
 
