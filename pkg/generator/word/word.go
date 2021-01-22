@@ -1,3 +1,4 @@
+// Package word is a utility to create a random sentence generator
 package word
 
 import (

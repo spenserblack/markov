@@ -1,3 +1,4 @@
+// Package generator contains random generators that use markov chains
 package generator
 
 // StringGenerator is a type that uses a Markov chain to generate a randomized string.

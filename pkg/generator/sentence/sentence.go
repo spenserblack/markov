@@ -1,3 +1,4 @@
+// Package sentence is a utility to create a random sentence generator
 package sentence
 
 import (
