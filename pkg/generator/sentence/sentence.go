@@ -71,7 +71,7 @@ func New(sentences []string, prefixLen int) (generator gen.StringGenerator, err 
 
 	waiter.Wait()
 
-	g.generator, err = gen.New(bytes, prefixLen)
+	g.generator, err = gen.NewByteGenerator(bytes, prefixLen)
 	generator = g
 
 	return

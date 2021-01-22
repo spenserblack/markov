@@ -59,7 +59,7 @@ func (generator *ByteGenerator) Generate(c chan []byte) {
 	}
 }
 
-// New feeds data to a markov chain and returns the generator.
+// NewByteGenerator feeds data to a markov chain and returns the generator.
 //
 // The 3-Dimensional slice of bytes can be a bit confusing, but here's the
 // logic behind it:
@@ -77,7 +77,7 @@ func (generator *ByteGenerator) Generate(c chan []byte) {
 //	{[]byte("Hello,"), []byte("World!")},
 //	{[]byte("Hello,"), []byte("Go!")},
 // }
-func New(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
+func NewByteGenerator(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 	if prefixLen < 1 {
 		err = errors.New("prefixLen must be 1 or greater")
 		return
