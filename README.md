@@ -1,5 +1,6 @@
 ![CI](https://github.com/spenserblack/markov/workflows/CI/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/spenserblack/markov)](https://goreportcard.com/report/github.com/spenserblack/markov)
+[![Go Reference](https://pkg.go.dev/badge/github.com/spenserblack/markov.svg)](https://pkg.go.dev/github.com/spenserblack/markov)
 
 My attempt at setting up a Markov chain without fully understanding how it works.
 
