@@ -13,13 +13,14 @@ import (
 	"time"
 )
 
+var prefixLen = flag.Int("n", 1, "number of tokens to use to map following token")
+var maxTokens = flag.Int("max", 0, "maximum number of tokens to generate. a zero or negative number signifies no maximum")
+var genWord = flag.Bool("w", false, "generate a word instead of a sentence")
+var printHelp = flag.Bool("h", false, "print this help message")
+
 func main() {
 	var markov generator.StringGenerator
 	var err error
-	prefixLen := flag.Int("n", 1, "number of tokens to use to map following token")
-	maxTokens := flag.Int("max", 0, "maximum number of tokens to generate. a zero or negative number signifies no maximum")
-	genWord := flag.Bool("w", false, "generate a word instead of a sentence")
-	printHelp := flag.Bool("h", false, "print this help message")
 	flag.Parse()
 
 	feedFile := flag.Arg(0)
