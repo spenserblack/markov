@@ -14,7 +14,7 @@ type wordGenerator struct {
 
 // Generate returns a random word using the Markov chain.
 //
-// If maxTokens is <= 0, then generation will continue until its "natural"
+// If maxTokens is < 0, then generation will continue until its "natural"
 // end from the chain deciding that a token should end the chain.
 // Enforcing a maximum number of tokens can be helpful if the chain has a
 // chance of generating infinitely, or to simply prevent the generated
@@ -24,7 +24,7 @@ func (generator *wordGenerator) Generate(maxTokens int) string {
 
 	g := generator.generator.Generate()
 
-	for i, next := 0, g(); i < maxTokens && next != nil; i++ {
+	for i, next := 0, g(); i != maxTokens && next != nil; i++ {
 		for _, b := range next {
 			builder.WriteByte(b)
 		}

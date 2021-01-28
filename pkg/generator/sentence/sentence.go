@@ -13,13 +13,13 @@ type sentenceGenerator struct {
 
 // Generate returns a random sentence using the Markov chain.
 //
-// If maxTokens is <= 0, then generation will continue until its "natural"
+// If maxTokens is < 0, then generation will continue until its "natural"
 // end from the chain deciding that a token should end the chain.
 // Enforcing a maximum number of tokens can be helpful if the chain has a
 // chance of generating infinitely, or to simply prevent the generated
 // sentence from being overly long.
 func (generator *sentenceGenerator) Generate(maxTokens int) string {
-	if maxTokens < 1 {
+	if maxTokens == 0 {
 		return ""
 	}
 
@@ -33,7 +33,7 @@ func (generator *sentenceGenerator) Generate(maxTokens int) string {
 		builder.WriteByte(b)
 	}
 
-	for i, next := 1, g(); i < maxTokens && next != nil; i++ {
+	for i, next := 1, g(); i != maxTokens && next != nil; i++ {
 		builder.WriteRune(' ')
 		for _, b := range next {
 			builder.WriteByte(b)
