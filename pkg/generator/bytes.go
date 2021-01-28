@@ -71,12 +71,6 @@ func (generator *ByteGenerator) Generate(c chan []byte) {
 //
 // - The 1st dimension are the particles that each token is composed of. For
 // example, the letters in a word.
-//
-// So, if you want to feed the sentences "Hello, World!" and "Hello, Go!" into
-// the chain, you would use [][][]byte{
-//	{[]byte("Hello,"), []byte("World!")},
-//	{[]byte("Hello,"), []byte("Go!")},
-// }
 func NewByteGenerator(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
 	if prefixLen < 1 {
 		err = errors.New("prefixLen must be 1 or greater")
