@@ -21,19 +21,14 @@ type wordGenerator struct {
 // word from being overly long.
 func (generator *wordGenerator) Generate(maxTokens int) string {
 	var builder strings.Builder
-	c := make(chan []byte)
-	tokenCounter := 1
 
-	go generator.generator.Generate(c)
+	g := generator.generator.Generate()
 
-	for bytes := range c {
-		for _, b := range bytes {
+	for i, next := 0, g(); i < maxTokens && next != nil; i++ {
+		for _, b := range next {
 			builder.WriteByte(b)
 		}
-		if tokenCounter == maxTokens {
-			break
-		}
-		tokenCounter++
+		next = g()
 	}
 
 	return builder.String()
