@@ -8,7 +8,7 @@ import (
 	"unicode/utf8"
 )
 
-type wordGenerator struct {
+type WordChain struct {
 	chain *chain.ByteChain
 }
 
@@ -18,8 +18,8 @@ var StopIteration error = errors.New("Generation has completed")
 // Generate returns a generator of random runes using the Markov chain.
 //
 // Returns a StopIteration error if/when generation has completed.
-func (generator *wordGenerator) Generate() func() (next rune, stop error) {
-	g := generator.chain.Generate()
+func (chain *WordChain) Generate() func() (next rune, stop error) {
+	g := chain.chain.Generate()
 
 	return func() (next rune, stop error) {
 		bytes := g()
@@ -43,8 +43,8 @@ func (generator *wordGenerator) Generate() func() (next rune, stop error) {
 // `prefixLen` is the number of letters to be used as a "key" to deciding the next
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
-func New(words []string, prefixLen int) (generator *wordGenerator, err error) {
-	g := new(wordGenerator)
+func New(words []string, prefixLen int) (wordChain *WordChain, err error) {
+	wordChain = new(WordChain)
 
 	bytes := make([][][]byte, len(words), len(words))
 
@@ -71,8 +71,7 @@ func New(words []string, prefixLen int) (generator *wordGenerator, err error) {
 
 	waiter.Wait()
 
-	g.chain, err = chain.NewByteChain(bytes, prefixLen)
-	generator = g
+	wordChain.chain, err = chain.NewByteChain(bytes, prefixLen)
 
 	return
 }
