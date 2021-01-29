@@ -4,7 +4,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/spenserblack/markov/pkg/chain/sentence"
+	"github.com/spenserblack/markov/pkg/chain"
 	"github.com/spenserblack/markov/pkg/chain/word"
 	"io/ioutil"
 	"math/rand"
@@ -60,7 +60,7 @@ func main() {
 			break
 		}
 	} else {
-		markov, err := sentence.New(strings.Split(feed, "\n"), *prefixLen)
+		markov, err := chain.NewSentenceChain(strings.Split(feed, "\n"), *prefixLen)
 		if err != nil {
 			panic(err)
 		}

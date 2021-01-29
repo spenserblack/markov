@@ -1,15 +1,13 @@
-// Package sentence is a utility to create a random sentence generator
-package sentence
+package chain
 
 import (
 	"errors"
-	"github.com/spenserblack/markov/pkg/chain"
 	"strings"
 	"sync"
 )
 
 type SentenceChain struct {
-	chain *chain.ByteChain
+	chain *ByteChain
 }
 
 // Generate returns a generator of random words that make up a sentence, using
@@ -27,7 +25,7 @@ func (chain *SentenceChain) Generate() func() (next string, stop error) {
 	}
 }
 
-// New feeds data to a markov chain and returns the sentence generator.
+// NewSentenceChain feeds data to a markov chain and returns the sentence generator.
 //
 // Each sentence in `sentences` should be a string of space-separated words to
 // be used when building the chain -- order of the words determines how each next
@@ -36,7 +34,7 @@ func (chain *SentenceChain) Generate() func() (next string, stop error) {
 // word. For example, if `prefixLen` is 2 and the generated text is "I made a
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
-func New(sentences []string, prefixLen int) (sentenceChain *SentenceChain, err error) {
+func NewSentenceChain(sentences []string, prefixLen int) (sentenceChain *SentenceChain, err error) {
 	sentenceChain = new(SentenceChain)
 
 	bytes := make([][][]byte, len(sentences), len(sentences))
@@ -59,7 +57,7 @@ func New(sentences []string, prefixLen int) (sentenceChain *SentenceChain, err e
 
 	waiter.Wait()
 
-	sentenceChain.chain, err = chain.NewByteChain(bytes, prefixLen)
+	sentenceChain.chain, err = NewByteChain(bytes, prefixLen)
 
 	return
 }
