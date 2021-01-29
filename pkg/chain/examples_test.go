@@ -60,3 +60,29 @@ func ExampleWordChain() {
 	fmt.Println(string(r))
 	// Output: e
 }
+
+// ExampleSentenceChain feeds "It's a test." and "A passing test." into a word
+// chain,and outputs the third word (which should always be "test.").
+func ExampleSentenceChain() {
+	feed := []string{
+		"It's a test.",
+		"A passing test.",
+	}
+
+	// Look 2 tokens back to generate the next token.
+	sentenceChain, err := chain.NewSentenceChain(feed, 2)
+
+	next := sentenceChain.Generate()
+
+	next()
+	next()
+
+	word, err := next()
+
+	if err == chain.StopIteration {
+		panic("We should be able to generate at least 3 words :(")
+	}
+
+	fmt.Println(string(word))
+	// Output: test.
+}
