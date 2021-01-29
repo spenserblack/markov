@@ -21,8 +21,8 @@ type BytesChain struct {
 //
 // For example, if Generate was used to create a random sentence, then each
 // []byte would a word in the sentence.
-func (generator *BytesChain) Generate() func() (next []byte, stop error) {
-	lastBytes := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
+func (bytesChain *BytesChain) Generate() func() (next []byte, stop error) {
+	lastBytes := bytesChain.chainStarters[rand.Intn(len(bytesChain.chainStarters))]
 
 	h := sha1.New()
 
@@ -41,7 +41,7 @@ func (generator *BytesChain) Generate() func() (next []byte, stop error) {
 		key := string(h.Sum(nil))
 
 		nextValue := []byte(nil)
-		if nextValues, ok := generator.chain[key]; ok {
+		if nextValues, ok := bytesChain.chain[key]; ok {
 			nextValue = nextValues[rand.Intn(len(nextValues))]
 		}
 
