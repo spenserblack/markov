@@ -31,7 +31,7 @@ func (bytesChain *BytesChain) Generator() func() (next []byte, stop error) {
 		next = lastBytes[0]
 
 		if next == nil {
-			stop = StopIteration
+			stop = ErrStopIter
 			return
 		}
 

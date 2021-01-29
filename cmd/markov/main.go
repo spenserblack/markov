@@ -53,7 +53,7 @@ func main() {
 				fmt.Print(string(next))
 				continue
 			}
-			if err != chain.StopIteration {
+			if err != chain.ErrStopIter {
 				panic(err)
 			}
 			break

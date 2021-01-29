@@ -3,5 +3,5 @@ package chain
 
 import "errors"
 
-// StopIteration signifies that the generator should stop
-var StopIteration error = errors.New("Generation has completed")
+// ErrStopIter signifies that the generator should stop
+var ErrStopIter error = errors.New("Generation has completed")

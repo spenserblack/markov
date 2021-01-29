@@ -34,7 +34,7 @@ func ExampleBytesChain() {
 
 	bytes, err := next()
 
-	if err == chain.StopIteration {
+	if err == chain.ErrStopIter {
 		panic("We should be able to generate at least 1 byte slice :(")
 	}
 	if err != nil {
@@ -59,7 +59,7 @@ func ExampleWordChain() {
 
 	r, err := next()
 
-	if err == chain.StopIteration {
+	if err == chain.ErrStopIter {
 		panic("We should be able to generate at least 2 runes :(")
 	}
 	if err != nil {
@@ -88,7 +88,7 @@ func ExampleSentenceChain() {
 
 	word, err := next()
 
-	if err == chain.StopIteration {
+	if err == chain.ErrStopIter {
 		panic("We should be able to generate at least 3 words :(")
 	}
 
