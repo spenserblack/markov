@@ -23,16 +23,16 @@ that should be fed to the chain separated by newlines.
 
 ```bash
 # print help
-markov -h
+markov -help
 
 # feed a list of sentences and generate a random sentence
 markov <filename>
 
 # feed a list of words and generate a random word
-markov -w <filename>
+markov -word <filename>
 
 # specify the number of previous tokens to use when mapping the next token
-markov -n <token number> <remaining args>
+markov -prefix <token number> <remaining args>
 ```
 
 ## Use in your Go project
@@ -49,12 +49,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/spenserblack/markov/pkg/generator/sentence"
+	"github.com/spenserblack/markov/pkg/chain"
 )
 
 func main() {
 	sentences := []string{"foo bar baz", "foo bar bar", "foo foo baz"}
-	fmt.Println(sentence.New(sentences, 1).Generate())
+	c, err := chain.NewSentenceChain(sentences, 1)
+
+	// do something to handle error
+
+	next := c.Generator()
+
+	for word, err := next(); err == nil; word, err = next() {
+		fmt.Printf("%s ", word)
+	}
 }
 ```
 
@@ -82,11 +90,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/spenserblack/markov/pkg/generator/word"
+	"github.com/spenserblack/markov/pkg/chain"
 )
 
 func main() {
 	words := []string{"Go", "Golang", "Good morning", "Good day"}
-	fmt.Println(word.New(words, 1).Generate())
+	c, err := chain.NewWordChain(words, 1)
+
+	// do something to handle error
+
+	next := c.Generator()
+
+	for letter, err := next(); err == nil; letter, err = next() {
+		fmt.Printf("%c", letter)
+	}
 }
 ```
