@@ -4,7 +4,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/spenserblack/markov/pkg/generator"
 	"github.com/spenserblack/markov/pkg/generator/sentence"
 	"github.com/spenserblack/markov/pkg/generator/word"
 	"io/ioutil"
@@ -19,7 +18,6 @@ var genWord = flag.Bool("w", false, "generate a word instead of a sentence")
 var printHelp = flag.Bool("h", false, "print this help message")
 
 func main() {
-	var markov generator.StringGenerator
 	var err error
 	flag.Parse()
 
@@ -45,22 +43,35 @@ func main() {
 	feed := string(feedBytes)
 
 	if *genWord {
-		markov, err = word.New(strings.Split(feed, "\n"), *prefixLen)
+		markov, err := word.New(strings.Split(feed, "\n"), *prefixLen)
+		if err != nil {
+			panic(err)
+		}
+		generator := markov.Generate()
+
+		for next, err := generator(); ; next, err = generator() {
+			if err == nil {
+				fmt.Print(string(next))
+				continue
+			}
+			if err != word.StopIteration {
+				panic(err)
+			}
+			break
+		}
 	} else {
-		markov, err = sentence.New(strings.Split(feed, "\n"), *prefixLen)
+		markov, err := sentence.New(strings.Split(feed, "\n"), *prefixLen)
+		if err != nil {
+			panic(err)
+		}
+		generator := markov.Generate()
+
+		for next, err := generator(); err == nil; next, err = generator() {
+			fmt.Print(next)
+			fmt.Print(" ")
+		}
 	}
-
-	if err != nil {
-		panic(err)
-	}
-
-	output := markov.Generate(*maxTokens)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(output)
+	fmt.Println()
 }
 
 func init() {
