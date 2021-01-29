@@ -30,10 +30,8 @@ func Example() {
 		panic(err)
 	}
 
-	c := make(chan []byte)
+	next := g.Generate()
 
-	go g.Generate(c)
-
-	fmt.Println(string(<-c))
+	fmt.Println(string(next()))
 	// Output: Hello,
 }
