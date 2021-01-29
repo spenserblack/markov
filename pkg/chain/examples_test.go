@@ -30,7 +30,7 @@ func ExampleBytesChain() {
 		panic(err)
 	}
 
-	next := byteChain.Generate()
+	next := byteChain.Generator()
 
 	bytes, err := next()
 
@@ -53,7 +53,7 @@ func ExampleWordChain() {
 	// Look 3 tokens back to generate the next token.
 	wordChain, err := chain.NewWordChain(feed, 3)
 
-	next := wordChain.Generate()
+	next := wordChain.Generator()
 
 	next()
 
@@ -81,7 +81,7 @@ func ExampleSentenceChain() {
 	// Look 2 tokens back to generate the next token.
 	sentenceChain, err := chain.NewSentenceChain(feed, 2)
 
-	next := sentenceChain.Generate()
+	next := sentenceChain.Generator()
 
 	next()
 	next()

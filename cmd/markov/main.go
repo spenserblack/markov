@@ -46,7 +46,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		generator := markov.Generate()
+		generator := markov.Generator()
 
 		for next, err := generator(); ; next, err = generator() {
 			if err == nil {
@@ -63,7 +63,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		generator := markov.Generate()
+		generator := markov.Generator()
 
 		for next, err := generator(); err == nil; next, err = generator() {
 			fmt.Print(next)

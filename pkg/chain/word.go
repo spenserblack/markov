@@ -13,8 +13,8 @@ type WordChain struct {
 // Generate returns a generator of random runes using the Markov chain.
 //
 // Returns a StopIteration error if/when generation has completed.
-func (chain *WordChain) Generate() func() (next rune, stop error) {
-	g := chain.chain.Generate()
+func (chain *WordChain) Generator() func() (next rune, stop error) {
+	g := chain.chain.Generator()
 
 	return func() (next rune, stop error) {
 		bytes, err := g()

@@ -11,8 +11,8 @@ type SentenceChain struct {
 
 // Generate returns a generator of random words that make up a sentence, using
 // the Markov chain.
-func (chain *SentenceChain) Generate() func() (next string, stop error) {
-	g := chain.chain.Generate()
+func (chain *SentenceChain) Generator() func() (next string, stop error) {
+	g := chain.chain.Generator()
 
 	return func() (next string, stop error) {
 		if bytes, err := g(); err != nil {
