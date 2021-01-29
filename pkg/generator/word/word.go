@@ -2,8 +2,8 @@
 package word
 
 import (
+	"errors"
 	gen "github.com/spenserblack/markov/pkg/generator"
-	"strings"
 	"sync"
 	"unicode/utf8"
 )
@@ -12,26 +12,27 @@ type wordGenerator struct {
 	generator *gen.ByteGenerator
 }
 
-// Generate returns a random word using the Markov chain.
-//
-// If maxTokens is < 0, then generation will continue until its "natural"
-// end from the chain deciding that a token should end the chain.
-// Enforcing a maximum number of tokens can be helpful if the chain has a
-// chance of generating infinitely, or to simply prevent the generated
-// word from being overly long.
-func (generator *wordGenerator) Generate(maxTokens int) string {
-	var builder strings.Builder
+// StopIteration signifies that the generator should stop
+var StopIteration error = errors.New("Generation has completed")
 
+// Generate returns a generator of random runes using the Markov chain.
+//
+// Returns a StopIteration error if/when generation has completed.
+func (generator *wordGenerator) Generate() func() (next rune, stop error) {
 	g := generator.generator.Generate()
 
-	for i, next := 0, g(); i != maxTokens && next != nil; i++ {
-		for _, b := range next {
-			builder.WriteByte(b)
+	return func() (next rune, stop error) {
+		bytes := g()
+		if bytes == nil {
+			return next, StopIteration
 		}
-		next = g()
-	}
+		next, _ = utf8.DecodeRune(bytes)
 
-	return builder.String()
+		if next == utf8.RuneError {
+			stop = errors.New("Could not decode bytes to rune. Was valid UTF-8 used?")
+		}
+		return
+	}
 }
 
 // New feeds data to a markov chain and return the word generator.
@@ -42,7 +43,7 @@ func (generator *wordGenerator) Generate(maxTokens int) string {
 // `prefixLen` is the number of letters to be used as a "key" to deciding the next
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
-func New(words []string, prefixLen int) (generator gen.StringGenerator, err error) {
+func New(words []string, prefixLen int) (generator *wordGenerator, err error) {
 	g := new(wordGenerator)
 
 	bytes := make([][][]byte, len(words), len(words))
