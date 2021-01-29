@@ -16,9 +16,9 @@ func ExampleNewByteChain() {
 	chain.NewByteChain(feed, 1)
 }
 
-// Example feeds "Hello, World!" and "Hello, Go!" into a bytes chain, and
-// outputs the first word.
-func Example() {
+// ExampleByteChain feeds "Hello, World!" and "Hello, Go!" into a bytes chain,
+// and outputs the first word.
+func ExampleByteChain() {
 	feed := [][][]byte{
 		{[]byte("Hello,"), []byte("World!")},
 		{[]byte("Hello,"), []byte("Go!")},
