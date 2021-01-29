@@ -35,3 +35,28 @@ func ExampleByteChain() {
 	fmt.Println(string(next()))
 	// Output: Hello,
 }
+
+// ExampleWordChain feeds "Hello!" and "Test" into a word chain,and outputs the
+// second rune (which should always be "e").
+func ExampleWordChain() {
+	feed := []string{"Hello!", "Test"}
+
+	// Look 3 tokens back to generate the next token.
+	wordChain, err := chain.NewWordChain(feed, 3)
+
+	next := wordChain.Generate()
+
+	next()
+
+	r, err := next()
+
+	if err == chain.StopIteration {
+		panic("We should be able to generate at least 2 runes :(")
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(r))
+	// Output: e
+}
