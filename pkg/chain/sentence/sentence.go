@@ -3,13 +3,13 @@ package sentence
 
 import (
 	"errors"
-	gen "github.com/spenserblack/markov/pkg/generator"
+	"github.com/spenserblack/markov/pkg/chain"
 	"strings"
 	"sync"
 )
 
 type sentenceGenerator struct {
-	generator *gen.ByteGenerator
+	generator *chain.ByteGenerator
 }
 
 // Generate returns a generator of random words that make up a sentence, using
@@ -59,7 +59,7 @@ func New(sentences []string, prefixLen int) (generator *sentenceGenerator, err e
 
 	waiter.Wait()
 
-	g.generator, err = gen.NewByteGenerator(bytes, prefixLen)
+	g.generator, err = chain.NewByteGenerator(bytes, prefixLen)
 	generator = g
 
 	return

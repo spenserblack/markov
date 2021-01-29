@@ -4,8 +4,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/spenserblack/markov/pkg/generator/sentence"
-	"github.com/spenserblack/markov/pkg/generator/word"
+	"github.com/spenserblack/markov/pkg/chain/sentence"
+	"github.com/spenserblack/markov/pkg/chain/word"
 	"io/ioutil"
 	"math/rand"
 	"strings"

@@ -1,22 +1,22 @@
-package generator_test
+package chain_test
 
 import (
 	"fmt"
-	"github.com/spenserblack/markov/pkg/generator"
+	"github.com/spenserblack/markov/pkg/chain"
 )
 
 // ExampleNewByteGenerator feeds "Hello, World!" and "Hello, Go!" into a bytes
-// generator.
+// chain.
 func ExampleNewByteGenerator() {
 	feed := [][][]byte{
 		{[]byte("Hello,"), []byte("World!")},
 		{[]byte("Hello,"), []byte("Go!")},
 	}
 
-	generator.NewByteGenerator(feed, 1)
+	chain.NewByteGenerator(feed, 1)
 }
 
-// Example feeds "Hello, World!" and "Hello, Go!" into a bytes generator, and
+// Example feeds "Hello, World!" and "Hello, Go!" into a bytes chain, and
 // outputs the first word.
 func Example() {
 	feed := [][][]byte{
@@ -24,7 +24,7 @@ func Example() {
 		{[]byte("Hello,"), []byte("Go!")},
 	}
 
-	g, err := generator.NewByteGenerator(feed, 1)
+	g, err := chain.NewByteGenerator(feed, 1)
 
 	if err != nil {
 		panic(err)

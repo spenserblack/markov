@@ -1,4 +1,4 @@
-package generator
+package chain
 
 import (
 	"crypto/sha1"

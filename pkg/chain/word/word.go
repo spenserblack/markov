@@ -3,13 +3,13 @@ package word
 
 import (
 	"errors"
-	gen "github.com/spenserblack/markov/pkg/generator"
+	"github.com/spenserblack/markov/pkg/chain"
 	"sync"
 	"unicode/utf8"
 )
 
 type wordGenerator struct {
-	generator *gen.ByteGenerator
+	generator *chain.ByteGenerator
 }
 
 // StopIteration signifies that the generator should stop
@@ -71,7 +71,7 @@ func New(words []string, prefixLen int) (generator *wordGenerator, err error) {
 
 	waiter.Wait()
 
-	g.generator, err = gen.NewByteGenerator(bytes, prefixLen)
+	g.generator, err = chain.NewByteGenerator(bytes, prefixLen)
 	generator = g
 
 	return
