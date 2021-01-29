@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+// SentenceChain represents a Markov chain that can be used to generate a
+// sentence.
 type SentenceChain struct {
 	chain *BytesChain
 }

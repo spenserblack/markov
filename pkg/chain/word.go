@@ -6,6 +6,8 @@ import (
 	"unicode/utf8"
 )
 
+// WordChain represents a Markov chain that can be used to generate a sequence
+// of runes.
 type WordChain struct {
 	chain *BytesChain
 }
