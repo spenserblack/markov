@@ -9,13 +9,13 @@ import (
 )
 
 type sentenceGenerator struct {
-	generator *chain.ByteGenerator
+	chain *chain.ByteChain
 }
 
 // Generate returns a generator of random words that make up a sentence, using
 // the Markov chain.
 func (generator *sentenceGenerator) Generate() func() (next string, stop error) {
-	g := generator.generator.Generate()
+	g := generator.chain.Generate()
 
 	return func() (next string, stop error) {
 		if bytes := g(); bytes != nil {
@@ -59,7 +59,7 @@ func New(sentences []string, prefixLen int) (generator *sentenceGenerator, err e
 
 	waiter.Wait()
 
-	g.generator, err = chain.NewByteGenerator(bytes, prefixLen)
+	g.chain, err = chain.NewByteChain(bytes, prefixLen)
 	generator = g
 
 	return

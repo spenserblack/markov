@@ -5,15 +5,15 @@ import (
 	"github.com/spenserblack/markov/pkg/chain"
 )
 
-// ExampleNewByteGenerator feeds "Hello, World!" and "Hello, Go!" into a bytes
+// ExampleNewByteChain feeds "Hello, World!" and "Hello, Go!" into a bytes
 // chain.
-func ExampleNewByteGenerator() {
+func ExampleNewByteChain() {
 	feed := [][][]byte{
 		{[]byte("Hello,"), []byte("World!")},
 		{[]byte("Hello,"), []byte("Go!")},
 	}
 
-	chain.NewByteGenerator(feed, 1)
+	chain.NewByteChain(feed, 1)
 }
 
 // Example feeds "Hello, World!" and "Hello, Go!" into a bytes chain, and
@@ -24,7 +24,7 @@ func Example() {
 		{[]byte("Hello,"), []byte("Go!")},
 	}
 
-	g, err := chain.NewByteGenerator(feed, 1)
+	g, err := chain.NewByteChain(feed, 1)
 
 	if err != nil {
 		panic(err)

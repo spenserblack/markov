@@ -9,7 +9,7 @@ import (
 )
 
 type wordGenerator struct {
-	generator *chain.ByteGenerator
+	chain *chain.ByteChain
 }
 
 // StopIteration signifies that the generator should stop
@@ -19,7 +19,7 @@ var StopIteration error = errors.New("Generation has completed")
 //
 // Returns a StopIteration error if/when generation has completed.
 func (generator *wordGenerator) Generate() func() (next rune, stop error) {
-	g := generator.generator.Generate()
+	g := generator.chain.Generate()
 
 	return func() (next rune, stop error) {
 		bytes := g()
@@ -71,7 +71,7 @@ func New(words []string, prefixLen int) (generator *wordGenerator, err error) {
 
 	waiter.Wait()
 
-	g.generator, err = chain.NewByteGenerator(bytes, prefixLen)
+	g.chain, err = chain.NewByteChain(bytes, prefixLen)
 	generator = g
 
 	return

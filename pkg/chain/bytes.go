@@ -9,8 +9,8 @@ import (
 
 type markovChain = map[string][][]byte
 
-// ByteGenerator uses a Markov chain to create a randomized sequence of tokens.
-type ByteGenerator struct {
+// ByteChain uses a Markov chain to create a randomized sequence of tokens.
+type ByteChain struct {
 	chain         markovChain
 	chainStarters [][][]byte
 }
@@ -21,7 +21,7 @@ type ByteGenerator struct {
 //
 // For example, if Generate was used to create a random sentence, then each
 // []byte would a word in the sentence.
-func (generator *ByteGenerator) Generate() func() []byte {
+func (generator *ByteChain) Generate() func() []byte {
 	lastBytes := generator.chainStarters[rand.Intn(len(generator.chainStarters))]
 
 	h := sha1.New()
@@ -50,7 +50,7 @@ func (generator *ByteGenerator) Generate() func() []byte {
 	}
 }
 
-// NewByteGenerator feeds data to a markov chain and returns the generator.
+// NewByteChain feeds data to a markov chain and returns the generator.
 //
 // The 3-Dimensional slice of bytes can be a bit confusing, but here's the
 // logic behind it:
@@ -62,13 +62,13 @@ func (generator *ByteGenerator) Generate() func() []byte {
 //
 // - The 1st dimension are the particles that each token is composed of. For
 // example, the letters in a word.
-func NewByteGenerator(feed [][][]byte, prefixLen int) (generator *ByteGenerator, err error) {
+func NewByteChain(feed [][][]byte, prefixLen int) (generator *ByteChain, err error) {
 	if prefixLen < 1 {
 		err = errors.New("prefixLen must be 1 or greater")
 		return
 	}
 
-	generator = new(ByteGenerator)
+	generator = new(ByteChain)
 	generator.chain = make(markovChain)
 	generator.chainStarters = make([][][]byte, 0, len(feed))
 	var chainMutex, chainStarterMutex sync.Mutex
