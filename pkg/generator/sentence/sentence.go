@@ -53,7 +53,7 @@ func (generator *sentenceGenerator) Generate(maxTokens int) string {
 // word. For example, if `prefixLen` is 2 and the generated text is "I made a
 // chain" then "I made" was a key to "a" and "made a" was a key to "chain" in
 // the sentence.
-func New(sentences []string, prefixLen int) (generator gen.StringGenerator, err error) {
+func New(sentences []string, prefixLen int) (generator *sentenceGenerator, err error) {
 	g := new(sentenceGenerator)
 
 	bytes := make([][][]byte, len(sentences), len(sentences))

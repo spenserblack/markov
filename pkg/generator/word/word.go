@@ -42,7 +42,7 @@ func (generator *wordGenerator) Generate(maxTokens int) string {
 // `prefixLen` is the number of letters to be used as a "key" to deciding the next
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
-func New(words []string, prefixLen int) (generator gen.StringGenerator, err error) {
+func New(words []string, prefixLen int) (generator *wordGenerator, err error) {
 	g := new(wordGenerator)
 
 	bytes := make([][][]byte, len(words), len(words))
