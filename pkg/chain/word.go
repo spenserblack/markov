@@ -1,15 +1,13 @@
-// Package word is a utility to create a random sentence generator
-package word
+package chain
 
 import (
 	"errors"
-	"github.com/spenserblack/markov/pkg/chain"
 	"sync"
 	"unicode/utf8"
 )
 
 type WordChain struct {
-	chain *chain.ByteChain
+	chain *ByteChain
 }
 
 // StopIteration signifies that the generator should stop
@@ -35,7 +33,7 @@ func (chain *WordChain) Generate() func() (next rune, stop error) {
 	}
 }
 
-// New feeds data to a markov chain and return the word generator.
+// NewWordChain feeds data to a markov chain and return the word generator.
 //
 // Each word in `words` should be a string of letters to be used when building the
 // chain -- order of the letters determines how each next letter in a generated
@@ -43,7 +41,7 @@ func (chain *WordChain) Generate() func() (next rune, stop error) {
 // `prefixLen` is the number of letters to be used as a "key" to deciding the next
 // letter. For example, if `prefixLen` is 2 and the generated text is "abcd" then
 // "ab" was a key to "c" and "bc" was a key to "d" in the word.
-func New(words []string, prefixLen int) (wordChain *WordChain, err error) {
+func NewWordChain(words []string, prefixLen int) (wordChain *WordChain, err error) {
 	wordChain = new(WordChain)
 
 	bytes := make([][][]byte, len(words), len(words))
@@ -71,7 +69,7 @@ func New(words []string, prefixLen int) (wordChain *WordChain, err error) {
 
 	waiter.Wait()
 
-	wordChain.chain, err = chain.NewByteChain(bytes, prefixLen)
+	wordChain.chain, err = NewByteChain(bytes, prefixLen)
 
 	return
 }

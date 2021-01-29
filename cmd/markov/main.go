@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/spenserblack/markov/pkg/chain"
-	"github.com/spenserblack/markov/pkg/chain/word"
 	"io/ioutil"
 	"math/rand"
 	"strings"
@@ -43,7 +42,7 @@ func main() {
 	feed := string(feedBytes)
 
 	if *genWord {
-		markov, err := word.New(strings.Split(feed, "\n"), *prefixLen)
+		markov, err := chain.NewWordChain(strings.Split(feed, "\n"), *prefixLen)
 		if err != nil {
 			panic(err)
 		}
@@ -54,7 +53,7 @@ func main() {
 				fmt.Print(string(next))
 				continue
 			}
-			if err != word.StopIteration {
+			if err != chain.StopIteration {
 				panic(err)
 			}
 			break
