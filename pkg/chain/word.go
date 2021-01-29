@@ -17,9 +17,9 @@ func (chain *WordChain) Generate() func() (next rune, stop error) {
 	g := chain.chain.Generate()
 
 	return func() (next rune, stop error) {
-		bytes := g()
-		if bytes == nil {
-			return next, StopIteration
+		bytes, err := g()
+		if err != nil {
+			return next, err
 		}
 		next, _ = utf8.DecodeRune(bytes)
 

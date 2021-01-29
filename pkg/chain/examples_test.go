@@ -32,7 +32,16 @@ func ExampleByteChain() {
 
 	next := byteChain.Generate()
 
-	fmt.Println(string(next()))
+	bytes, err := next()
+
+	if err == chain.StopIteration {
+		panic("We should be able to generate at least 1 byte slice :(")
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(bytes))
 	// Output: Hello,
 }
 

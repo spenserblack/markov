@@ -15,10 +15,10 @@ func (chain *SentenceChain) Generate() func() (next string, stop error) {
 	g := chain.chain.Generate()
 
 	return func() (next string, stop error) {
-		if bytes := g(); bytes != nil {
-			next = string(bytes)
+		if bytes, err := g(); err != nil {
+			stop = err
 		} else {
-			stop = StopIteration
+			next = string(bytes)
 		}
 		return
 	}
