@@ -24,13 +24,13 @@ func ExampleByteChain() {
 		{[]byte("Hello,"), []byte("Go!")},
 	}
 
-	g, err := chain.NewByteChain(feed, 1)
+	byteChain, err := chain.NewByteChain(feed, 1)
 
 	if err != nil {
 		panic(err)
 	}
 
-	next := g.Generate()
+	next := byteChain.Generate()
 
 	fmt.Println(string(next()))
 	// Output: Hello,
