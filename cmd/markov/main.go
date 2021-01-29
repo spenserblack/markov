@@ -14,7 +14,7 @@ import (
 var prefixLen = flag.Int("n", 1, "number of tokens to use to map following token")
 var maxTokens = flag.Int("max", -1, "maximum number of tokens to generate. A negative number signifies no maximum")
 var genWord = flag.Bool("w", false, "generate a word instead of a sentence")
-var printHelp = flag.Bool("h", false, "print this help message")
+var printHelp = flag.Bool("help", false, "print this help message")
 
 func main() {
 	var err error
