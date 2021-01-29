@@ -10,9 +10,6 @@ type WordChain struct {
 	chain *ByteChain
 }
 
-// StopIteration signifies that the generator should stop
-var StopIteration error = errors.New("Generation has completed")
-
 // Generate returns a generator of random runes using the Markov chain.
 //
 // Returns a StopIteration error if/when generation has completed.
