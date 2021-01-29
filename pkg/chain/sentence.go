@@ -1,7 +1,6 @@
 package chain
 
 import (
-	"errors"
 	"strings"
 	"sync"
 )
@@ -19,7 +18,7 @@ func (chain *SentenceChain) Generate() func() (next string, stop error) {
 		if bytes := g(); bytes != nil {
 			next = string(bytes)
 		} else {
-			stop = errors.New("Generation has completed")
+			stop = StopIteration
 		}
 		return
 	}
