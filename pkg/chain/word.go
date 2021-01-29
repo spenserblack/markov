@@ -7,7 +7,7 @@ import (
 )
 
 type WordChain struct {
-	chain *ByteChain
+	chain *BytesChain
 }
 
 // Generate returns a generator of random runes using the Markov chain.
@@ -66,7 +66,7 @@ func NewWordChain(words []string, prefixLen int) (wordChain *WordChain, err erro
 
 	waiter.Wait()
 
-	wordChain.chain, err = NewByteChain(bytes, prefixLen)
+	wordChain.chain, err = NewBytesChain(bytes, prefixLen)
 
 	return
 }

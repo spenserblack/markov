@@ -6,7 +6,7 @@ import (
 )
 
 type SentenceChain struct {
-	chain *ByteChain
+	chain *BytesChain
 }
 
 // Generate returns a generator of random words that make up a sentence, using
@@ -56,7 +56,7 @@ func NewSentenceChain(sentences []string, prefixLen int) (sentenceChain *Sentenc
 
 	waiter.Wait()
 
-	sentenceChain.chain, err = NewByteChain(bytes, prefixLen)
+	sentenceChain.chain, err = NewBytesChain(bytes, prefixLen)
 
 	return
 }

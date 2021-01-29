@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-// TestNewPrefix1 calls generator.NewByteChain with prefixLen=1 and confirms that the
+// TestNewPrefix1 calls generator.NewBytesChain with prefixLen=1 and confirms that the
 // returned generator.BytesGenerator struct contains the expected contents.
 func TestNewPrefix1(t *testing.T) {
 	var feed [][][]byte = [][][]byte{
 		{[]byte("Hello,"), []byte("World!")},
 		{[]byte("Hello,"), []byte("Go!")},
 	}
-	generator, err := NewByteChain(feed, 1)
+	generator, err := NewBytesChain(feed, 1)
 
 	if err != nil {
 		t.Fatalf(`err = %v, want nil`, err)
@@ -48,14 +48,14 @@ func TestNewPrefix1(t *testing.T) {
 	}
 }
 
-// TestNewPrefix2 calls generator.NewByteChain with prefixLen=2 and confirms that the
+// TestNewPrefix2 calls generator.NewBytesChain with prefixLen=2 and confirms that the
 // returned generator.BytesGenerator struct contains the expected contents.
 func TestNewPrefix2(t *testing.T) {
 	var feed [][][]byte = [][][]byte{
 		{[]byte("Hello"), []byte(","), []byte("World!")},
 		{[]byte("Hello"), []byte("."), []byte("Go!")},
 	}
-	generator, err := NewByteChain(feed, 2)
+	generator, err := NewBytesChain(feed, 2)
 
 	if err != nil {
 		t.Fatalf(`err = %v, want nil`, err)
