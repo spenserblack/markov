@@ -15,12 +15,12 @@ type BytesChain struct {
 	chainStarters [][][]byte
 }
 
-// Generate creates a randomized sequence of bytes using the Markov chain.
+// Generator returns a generator function that returns a random sequence of
+// bytes each time it is called. The random bytes are chosen from the previous
+// bytes returned. If not enough bytes have been returned yet, then random bytes
+// are chosen that are marked as being able to start a chain.
 //
 // Each []byte is a token in the chain.
-//
-// For example, if Generate was used to create a random sentence, then each
-// []byte would a word in the sentence.
 func (bytesChain *BytesChain) Generator() func() (next []byte, stop error) {
 	lastBytes := bytesChain.chainStarters[rand.Intn(len(bytesChain.chainStarters))]
 
