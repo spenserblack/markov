@@ -28,7 +28,9 @@ func (bytesChain *BytesChain) Generator() func() (next []byte, stop error) {
 
 	return func() (next []byte, stop error) {
 		defer h.Reset()
-		next = lastBytes[0]
+		if len(lastBytes) != 0 {
+			next = lastBytes[0]
+		}
 
 		if next == nil {
 			stop = ErrStopIter
