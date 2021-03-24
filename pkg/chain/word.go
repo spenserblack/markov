@@ -23,8 +23,12 @@ func (chain *WordChain) Generator() func() (next rune, stop error) {
 		if err != nil {
 			return next, err
 		}
-		next, _ = utf8.DecodeRune(bytes)
+		next, size := utf8.DecodeRune(bytes)
 
+		// NOTE If bytes were empty, empty string was generated
+		if size == 0 {
+			return 0, ErrStopIter
+		}
 		if next == utf8.RuneError {
 			stop = errors.New("Could not decode bytes to rune. Was valid UTF-8 used?")
 		}
