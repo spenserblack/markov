@@ -14,8 +14,9 @@ func TestEmptyLine(t *testing.T) {
 		if err == nil {
 			continue
 		}
-		if err != ErrStopIter {
-			t.Fatalf("Received an error besides ErrStopIter: %v", err)
+		if err == ErrStopIter {
+			break
 		}
+		t.Fatalf("Received an error besides ErrStopIter: %v", err)
 	}
 }
