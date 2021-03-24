@@ -52,6 +52,11 @@ func NewWordChain(words []string, prefixLen int) (wordChain *WordChain, err erro
 		go func(index int, word string) {
 			defer waiter.Done()
 
+			if len(word) == 0 {
+				bytes[index] = [][]byte{{}}
+				return
+			}
+
 			runes := []rune(word)
 			runesAsBytes := make([][]byte, 0, len(runes))
 
