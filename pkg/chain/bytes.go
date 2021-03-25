@@ -76,9 +76,16 @@ func NewBytesChain(feed [][][]byte, prefixLen int) (generator *BytesChain, err e
 	}
 
 	generator = new(BytesChain)
-	generator.chain = make(markovChain)
-	generator.chainStarters = make([][][]byte, 0, len(feed))
-	var chainMutex, chainStarterMutex sync.Mutex
+	var chain struct {
+		sync.Mutex
+		val markovChain
+	}
+	var chainStarters struct {
+		sync.Mutex
+		val [][][]byte
+	}
+	chain.val = make(markovChain)
+	chainStarters.val = make([][][]byte, 0, len(feed))
 
 	var waiter sync.WaitGroup
 
@@ -99,9 +106,9 @@ func NewBytesChain(feed [][][]byte, prefixLen int) (generator *BytesChain, err e
 			}
 
 			var prefix [][]byte = sequence[:adjustedPrefixLen]
-			chainStarterMutex.Lock()
-			generator.chainStarters = append(generator.chainStarters, prefix)
-			chainStarterMutex.Unlock()
+			chainStarters.Lock()
+			chainStarters.val = append(chainStarters.val, prefix)
+			chainStarters.Unlock()
 
 			for i, suffix := range sequence[adjustedPrefixLen:] {
 				var prefix [][]byte = sequence[i : i+adjustedPrefixLen]
@@ -112,9 +119,9 @@ func NewBytesChain(feed [][][]byte, prefixLen int) (generator *BytesChain, err e
 
 				key := string(h.Sum(nil))
 
-				chainMutex.Lock()
-				generator.chain[key] = append(generator.chain[key], suffix)
-				chainMutex.Unlock()
+				chain.Lock()
+				chain.val[key] = append(chain.val[key], suffix)
+				chain.Unlock()
 				h.Reset()
 			}
 
@@ -124,13 +131,15 @@ func NewBytesChain(feed [][][]byte, prefixLen int) (generator *BytesChain, err e
 			}
 			key := string(h.Sum(nil))
 
-			chainMutex.Lock()
-			generator.chain[key] = append(generator.chain[key], nil)
-			chainMutex.Unlock()
+			chain.Lock()
+			chain.val[key] = append(chain.val[key], nil)
+			chain.Unlock()
 
 		}(sequence)
 	}
 
 	waiter.Wait()
+	generator.chain = chain.val
+	generator.chainStarters = chainStarters.val
 	return
 }
