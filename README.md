@@ -7,7 +7,7 @@ Randomly generate sequences of words, characters, or even bytes.
 ## Install
 
 ```bash
-go get -u github.com/spenserblack/markov/cmd/...
+go get -u github.com/spenserblack/markov/v2/cmd/...
 ```
 
 ## Build Binary
@@ -49,7 +49,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/spenserblack/markov/pkg/chain"
+	"github.com/spenserblack/markov/v2/pkg/chain"
 )
 
 func main() {
@@ -90,7 +90,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/spenserblack/markov/pkg/chain"
+	"github.com/spenserblack/markov/v2/pkg/chain"
 )
 
 func main() {

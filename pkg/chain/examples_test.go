@@ -2,7 +2,7 @@ package chain_test
 
 import (
 	"fmt"
-	"github.com/spenserblack/markov/pkg/chain"
+	"github.com/spenserblack/markov/v2/pkg/chain"
 )
 
 // ExampleNewBytesChain feeds "Hello, World!" and "Hello, Go!" into a bytes

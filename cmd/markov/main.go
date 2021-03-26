@@ -4,7 +4,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/spenserblack/markov/pkg/chain"
+	"github.com/spenserblack/markov/v2/pkg/chain"
 	"io/ioutil"
 	"math/rand"
 	"strings"
