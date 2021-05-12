@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.13
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - run: go build -v ./...
   
   test:
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.13
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - run: go test -v ./...
   
   check:
@@ -33,6 +33,6 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.13
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - run: go vet -v ./...
       - run: gofmt -s -d -l .
