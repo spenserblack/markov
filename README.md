@@ -2,6 +2,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/spenserblack/markov)](https://goreportcard.com/report/github.com/spenserblack/markov)
 [![Go Reference](https://pkg.go.dev/badge/github.com/spenserblack/markov/v2.svg)](https://pkg.go.dev/github.com/spenserblack/markov/v2)
 
+:warning: This repository is being archived in favor of
+[this "probability" go module](https://github.com/spenserblack/probability), which has support for Markov
+chains.
+
 Randomly generate sequences of words, characters, or even bytes.
 
 ## Install
